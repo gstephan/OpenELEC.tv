@@ -1,0 +1,10 @@
+#!/bin/sh
+#
+# watchdog-kicker for opera addon
+
+[ ! -c /dev/watchdog ] && exit
+
+while true; do
+  sleep 15
+  echo "." >/dev/watchdog
+done

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+  <!-- XBMC -->
+  <category label="30010">
+    <!-- <setting id="XBMC_PAUSE" type="bool" label="30011" default="true" enable="eq(1,false)" />
+    <setting id="XBMC_KILL" type="bool" label="30012" default="false" enable="eq(-1,false)" /> -->
+    <setting id="XBMC_KILL" type="bool" label="30012" default="false" />
+  </category>
+  
+  <!-- Window -->
+  <category label="30030">
+    <setting id="WINDOW_ACTIVATE"   type="bool"   label="30031" default="false" />
+    <setting id="CHANGE_RESOLUTION" type="bool"   label="30032" default="false" />
+    <setting id="OVERSCAN_ENABLE"   type="bool"   label="30051" default="false" />
+    <setting id="PADDING_LEFT"      type="slider" label="30052" default="30" range="0,1,50" option="int" enable="eq(-1,true)" />
+    <setting id="PADDING_TOP"       type="slider" label="30053" default="16" range="0,1,50" option="int" enable="eq(-2,true)" />
+    <setting id="PADDING_RIGHT"     type="slider" label="30054" default="30" range="0,1,50" option="int" enable="eq(-3,true)" />
+    <setting id="PADDING_BOTTOM"    type="slider" label="30055" default="16" range="0,1,50" option="int" enable="eq(-4,true)" />
+  </category>
+  
+  <!-- Other -->
+  <category label="30060">
+    <setting id="FLASH_ACCELERATION" type="bool" label="30061" default="false" />
+    <setting id="DELETE_PROFILE"     type="bool" label="30062" default="false" />
+  </category>
+</settings>

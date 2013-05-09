@@ -1,0 +1,76 @@
+2.1.30
+  Stop All Playing sounds and suspend xbmc audio properly (thanks to fritsch)
+2.1.29
+  Support for OpenELEC 3.0/3.01
+2.1.28
+  Small fix for OpenELEC 3.0 RC5
+2.1.27
+  Opera upgraded to version 12.14
+  Support for OpenELEC 3.0 RC3/RC4/RC5
+2.1.26
+  support for OpenELEC/xbmc watchdog
+  Support for OpenELEC 3.0 RC3
+2.1.25
+  Save downloaded files to USB stick (if there is a folder named opera-dl)
+  Support for OpenELEC 3.0 Beta 6 and RC1/RC2
+2.1.24
+  Opera upgraded to version 12.11
+  Opera and Flash binaries download from dropbox
+  Support for OpenELEC 3.0 Beta 3,4,5
+2.1.23
+  Added addon setting to delete Opera profile on start (useful on crash)
+2.1.22
+  xdotool searches Opera window by class not name (thanks to Tobster who finds the bug)
+  correctly saves current resolution
+2.1.21
+  New libraries for OpenELEC 2.0
+2.1.20
+  Support for OpenELEC 2.0 Release Candidate 1 and 2
+  Opera upgraded to version 12.02
+2.1.19
+  Adobe flash player upgraded to 11.2.202.238
+2.1.18
+  Opera upgraded to version 12.01
+  Support for Google Talk Plugin (and others in future)
+2.1.17
+  Accelerated flash option (set in addon settings)
+2.1.16
+  separated libraries from addon itself
+  only one addon (script itself downloads correct packages)
+  can be used on all OpenELEC builds (tested only on Ultra daily)
+2.1.15
+  Opera upgraded to version 12 final
+  Adobe flash player upgraded to 11.2 r202.236
+  Included chinese fonts
+  Included Opera AdBlock
+    https://addons.opera.com/en/extensions/details/opera-adblock/
+    http://dottech.org/tipsntricks/17516/block-ads-in-firefox-internet-explorer-chrome-and-opera-how-to/#opera
+2.1.14
+  Recompiled libraries for latest DAILY BUILDS (static png, freetype, fontconfig)
+  Changed Opera addon script to use ash instead of bash
+  Don't upgrade for OpenELEC beta 4 because there is nothing new inside!
+2.1.13
+  Adobe flash player upgraded to 11.2.202.235
+2.1.12
+  Opera upgraded to 1387
+  libraries recompiled from latest git (addon compatible with beta2)
+  plugins installed in addon home folders
+  tested web pages: youtube, smh.com.au, svtplay.se, rtvslo.si
+2.1.11
+  Opera upgraded to 1383
+  Adobe flash player upgraded to 11.2 r202.233
+2.1.10
+  Opera upgraded to 1362.x86_64 and 1360.i386
+  skipped licence window
+  extra plugins can be installed in addon home folder
+2.1.9
+  working again :)
+2.1.8
+  broken
+2.1.7
+  lower resolution when running addon
+2.1.6
+  finally working addon with settings
+2.1.1
+  initial addon based on Opera Next (12.00-1318.x86_64, 12.00-1317.i386)
+  and Adobe Flash Player 11
