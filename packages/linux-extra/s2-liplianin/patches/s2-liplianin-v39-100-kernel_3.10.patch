@@ -1,0 +1,52 @@
+diff -urN s2-liplianin-v39-org/linux/drivers/media/pci/bt8xx/bttv-i2c.c s2-liplianin-v39/linux/drivers/media/pci/bt8xx/bttv-i2c.c
+--- s2-liplianin-v39-org/linux/drivers/media/pci/bt8xx/bttv-i2c.c	2013-06-10 08:41:59.000000000 +0200
++++ s2-liplianin-v39/linux/drivers/media/pci/bt8xx/bttv-i2c.c	2013-07-11 10:22:23.320220254 +0200
+@@ -400,5 +401,6 @@
+ 	if (0 != btv->i2c_rc)
+ 		return 0;
+ 
+-	return i2c_del_adapter(&btv->c.i2c_adap);
++	i2c_del_adapter(&btv->c.i2c_adap);
++	return 0;
+ }
+diff -urN s2-liplianin-v39-org/linux/drivers/media/pci/zoran/zoran_procfs.c s2-liplianin-v39/linux/drivers/media/pci/zoran/zoran_procfs.c
+--- s2-liplianin-v39-org/linux/drivers/media/pci/zoran/zoran_procfs.c	2013-06-10 08:41:59.000000000 +0200
++++ s2-liplianin-v39/linux/drivers/media/pci/zoran/zoran_procfs.c	2013-07-11 10:22:22.515220090 +0200
+@@ -130,14 +130,14 @@
+ 
+ static int zoran_open(struct inode *inode, struct file *file)
+ {
+-	struct zoran *data = PDE(inode)->data;
++	struct zoran *data = PDE_DATA(inode);
+ 	return single_open(file, zoran_show, data);
+ }
+ 
+ static ssize_t zoran_write(struct file *file, const char __user *buffer,
+ 			size_t count, loff_t *ppos)
+ {
+-	struct zoran *zr = PDE(file_inode(file))->data;
++	struct zoran *zr = PDE_DATA(file_inode(file));
+ 	char *string, *sp;
+ 	char *line, *ldelim, *varname, *svar, *tdelim;
+ 
+@@ -201,7 +201,7 @@
+ 		dprintk(2,
+ 			KERN_INFO
+ 			"%s: procfs entry /proc/%s allocated. data=%p\n",
+-			ZR_DEVNAME(zr), name, zr->zoran_proc->data);
++			ZR_DEVNAME(zr), name, zr);
+ 	} else {
+ 		dprintk(1, KERN_ERR "%s: Unable to initialise /proc/%s\n",
+ 			ZR_DEVNAME(zr), name);
+diff -urN s2-liplianin-v39-org/linux/drivers/media/pci/ttpci/av7110_ir.c s2-liplianin-v39/linux/drivers/media/pci/ttpci/av7110_ir.c
+--- s2-liplianin-v39-org/linux/drivers/media/pci/ttpci/av7110_ir.c	2013-06-10 08:41:59.000000000 +0200
++++ s2-liplianin-v39/linux/drivers/media/pci/ttpci/av7110_ir.c	2013-07-11 10:22:21.970220914 +0200
+@@ -375,7 +375,7 @@
+ 	if (av_cnt == 1) {
+ 		e = proc_create("av7110_ir", S_IWUSR, NULL, &av7110_ir_proc_fops);
+ 		if (e)
+-			e->size = 4 + 256 * sizeof(u16);
++			proc_set_size(e, 4 + 256 * sizeof(u16));
+ 	}
+ 
+ 	tasklet_init(&av7110->ir.ir_tasklet, av7110_emit_key, (unsigned long) &av7110->ir);

@@ -1,0 +1,99 @@
+diff -urN media_build-185-org/linux/drivers/media/pci/bt8xx/bttv-input.c media_build-185/linux/drivers/media/pci/bt8xx/bttv-input.c
+--- media_build-185-org/linux/drivers/media/pci/bt8xx/bttv-input.c	2013-07-10 22:58:14.559239551 +0200
++++ media_build-185/linux/drivers/media/pci/bt8xx/bttv-input.c	2013-07-11 08:47:41.835221477 +0200
+@@ -417,7 +417,8 @@
+ 	if (0 != btv->i2c_rc)
+ 		return 0;
+ 
+-	return i2c_del_adapter(&btv->c.i2c_adap);
++	i2c_del_adapter(&btv->c.i2c_adap);
++	return 0;
+ }
+ 
+ int bttv_input_init(struct bttv *btv)
+diff -urN media_build-185-org/linux/drivers/media/pci/mantis/mantis_i2c.c media_build-185/linux/drivers/media/pci/mantis/mantis_i2c.c
+--- media_build-185-org/linux/drivers/media/pci/mantis/mantis_i2c.c	2013-04-17 10:55:07.000000000 +0200
++++ media_build-185/linux/drivers/media/pci/mantis/mantis_i2c.c	2013-07-11 08:55:13.502208525 +0200
+@@ -261,6 +261,7 @@
+ 	mmwrite((intmask & ~MANTIS_INT_I2CDONE), MANTIS_INT_MASK);
+ 
+ 	dprintk(MANTIS_DEBUG, 1, "Removing I2C adapter");
+-	return i2c_del_adapter(&mantis->adapter);
++	i2c_del_adapter(&mantis->adapter);
++	return 0;
+ }
+ EXPORT_SYMBOL_GPL(mantis_i2c_exit);
+diff -urN media_build-185/-orglinux/drivers/media/pci/saa716x/saa716x_i2c.c media_build-185/linux/drivers/media/pci/saa716x/saa716x_i2c.c
+--- media_build-185-org/linux/drivers/media/pci/saa716x/saa716x_i2c.c	2013-04-17 10:55:07.000000000 +0200
++++ media_build-185/linux/drivers/media/pci/saa716x/saa716x_i2c.c	2013-07-11 08:57:39.131316432 +0200
+@@ -721,11 +721,7 @@
+ 		saa716x_i2c_hwdeinit(i2c, SAA716x_I2C_BUS(i));
+ 		dprintk(SAA716x_DEBUG, 1, "Removing adapter (%d) %s", i, adapter->name);
+ 
+-		err = i2c_del_adapter(adapter);
+-		if (err < 0) {
+-			dprintk(SAA716x_ERROR, 1, "Adapter (%d) %s remove failed", i, adapter->name);
+-			goto exit;
+-		}
++		i2c_del_adapter(adapter);
+ 		i2c++;
+ 	}
+ 	dprintk(SAA716x_DEBUG, 1, "SAA%02x I2C Core succesfully removed", saa716x->pdev->device);
+diff -urN media_build-185-org/linux/drivers/media/pci/ttpci/av7110_ir.c media_build-185/linux/drivers/media/pci/ttpci/av7110_ir.c
+--- media_build-185-org/linux/drivers/media/pci/ttpci/av7110_ir.c	2013-04-17 10:55:07.000000000 +0200
++++ media_build-185/linux/drivers/media/pci/ttpci/av7110_ir.c	2013-07-11 08:51:13.348214637 +0200
+@@ -375,7 +375,7 @@
+ 	if (av_cnt == 1) {
+ 		e = proc_create("av7110_ir", S_IWUSR, NULL, &av7110_ir_proc_fops);
+ 		if (e)
+-			e->size = 4 + 256 * sizeof(u16);
++			proc_set_size(e, 4 + 256 * sizeof(u16));
+ 	}
+ 
+ 	tasklet_init(&av7110->ir.ir_tasklet, av7110_emit_key, (unsigned long) &av7110->ir);
+diff -urN media_build-185-org/linux/drivers/media/pci/zoran/zoran_procfs.c media_build-185/linux/drivers/media/pci/zoran/zoran_procfs.c
+--- media_build-185-org/linux/drivers/media/pci/zoran/zoran_procfs.c	2013-04-17 10:55:07.000000000 +0200
++++ media_build-185/linux/drivers/media/pci/zoran/zoran_procfs.c	2013-07-11 09:21:06.153236738 +0200
+@@ -130,14 +130,14 @@
+ 
+ static int zoran_open(struct inode *inode, struct file *file)
+ {
+-	struct zoran *data = PDE(inode)->data;
++	struct zoran *data = PDE_DATA(inode); 
+ 	return single_open(file, zoran_show, data);
+ }
+ 
+ static ssize_t zoran_write(struct file *file, const char __user *buffer,
+ 			size_t count, loff_t *ppos)
+ {
+-	struct zoran *zr = PDE(file->f_path.dentry->d_inode)->data;
++	struct zoran *zr = PDE_DATA(file_inode(file));
+ 	char *string, *sp;
+ 	char *line, *ldelim, *varname, *svar, *tdelim;
+ 
+@@ -201,7 +201,7 @@
+ 		dprintk(2,
+ 			KERN_INFO
+ 			"%s: procfs entry /proc/%s allocated. data=%p\n",
+-			ZR_DEVNAME(zr), name, zr->zoran_proc->data);
++			ZR_DEVNAME(zr), name, zr);
+ 	} else {
+ 		dprintk(1, KERN_ERR "%s: Unable to initialise /proc/%s\n",
+ 			ZR_DEVNAME(zr), name);
+diff -urN media_build-185-org/linux/drivers/staging/media/go7007/go7007-driver.c media_build-185/linux/drivers/staging/media/go7007/go7007-driver.c
+--- media_build-185-org/linux/drivers/staging/media/go7007/go7007-driver.c	2013-04-17 10:55:07.000000000 +0200
++++ media_build-185/linux/drivers/staging/media/go7007/go7007-driver.c	2013-07-11 08:53:30.024300625 +0200
+@@ -647,11 +647,8 @@
+ void go7007_remove(struct go7007 *go)
+ {
+ 	if (go->i2c_adapter_online) {
+-		if (i2c_del_adapter(&go->i2c_adapter) == 0)
+-			go->i2c_adapter_online = 0;
+-		else
+-			v4l2_err(&go->v4l2_dev,
+-				"error removing I2C adapter!\n");
++		i2c_del_adapter(&go->i2c_adapter);
++		go->i2c_adapter_online = 0;
+ 	}
+ 
+ 	if (go->audio_enabled)
