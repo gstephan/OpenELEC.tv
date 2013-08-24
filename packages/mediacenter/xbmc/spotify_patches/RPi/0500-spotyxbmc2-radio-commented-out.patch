@@ -1,0 +1,12 @@
+diff -urN xbmc-12.2-5ba69b6/xbmc/music/spotyXBMC/radio/RadioBackgroundLoader.cpp xbmc-new/xbmc/music/spotyXBMC/radio/RadioBackgroundLoader.cpp
+--- xbmc-12.2-5ba69b6/xbmc/music/spotyXBMC/radio/RadioBackgroundLoader.cpp	2013-08-29 07:10:32.000000000 +0200
++++ xbmc-new/xbmc/music/spotyXBMC/radio/RadioBackgroundLoader.cpp	2013-08-29 07:16:47.000000000 +0200
+@@ -68,7 +68,7 @@
+     //are we still missing tracks? Do a new search
+     if (m_radio->m_tracks.size() < m_radio->m_numberOfTracksToDisplay) {
+       m_radio->m_isWaitingForResults = true;
+-      m_radio->m_currentSearch = sp_radio_search_create(Session::getInstance()->getSpSession(), m_radio->m_fromYear, m_radio->m_toYear, m_radio->m_genres, &m_radio->cb_searchComplete, m_radio);
++      //peter m_radio->m_currentSearch = sp_radio_search_create(Session::getInstance()->getSpSession(), m_radio->m_fromYear, m_radio->m_toYear, m_radio->m_genres, &m_radio->cb_searchComplete, m_radio);
+       Session::getInstance()->unlock();
+     } else {
+       Logger::printOut("radio fetch tracks done");

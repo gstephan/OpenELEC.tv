@@ -18,6 +18,13 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
+if [ -x "/storage/.config/start_spotify" ]
+then
+  "/storage/.config/start_spotify"
+else
+  [ -x "/usr/share/misc/start_spotify" ] && "/usr/share/misc/start_spotify"
+fi
+
 # starting XBMC
 #
 # runlevels: openelec

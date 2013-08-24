@@ -48,5 +48,12 @@ fi
         swapon -p 10000 $SWAP 2>&1 > /dev/null
       done
       sysctl -w vm.swappiness=10 2>&1 > /dev/null
+  else
+    sysctl -w vm.dirty_ratio=80 2>&1 > /dev/null
+    sysctl -w vm.dirty_background_ratio=40 2>&1 > /dev/null
+    sysctl -w vm.dirty_expire_centisecs=18000 2>&1 > /dev/null
+    if [ -w /sys/block/`mount | grep "/storage" | cut -c 6-8`/queue/nr_requests ]; then
+      echo 16 > /sys/block/`mount | grep "/storage" | cut -c 6-8`/queue/nr_requests
+    fi
   fi
 )&

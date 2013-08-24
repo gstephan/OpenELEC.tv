@@ -1,5 +1,3 @@
-#!/bin/sh
-
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
 #      Copyright (C) 2009-2012 Stephan Raue (stephan@openelec.tv)
@@ -20,21 +18,21 @@
 #  http://www.gnu.org/copyleft/gpl.html
 ################################################################################
 
-. config/options $1
+PKG_NAME="lua"
+PKG_VERSION="5.2.1"
+PKG_REV="1"
+PKG_ARCH="any"
+PKG_LICENSE="MIT"
+PKG_SITE="http://www.lua.org/"
+PKG_URL="http://www.lua.org/ftp/$PKG_NAME-$PKG_VERSION.tar.gz"
+PKG_DEPENDS=""
+PKG_BUILD_DEPENDS="toolchain readline-host"
+PKG_PRIORITY="optional"
+PKG_SECTION="lang"
+PKG_SHORTDESC="lua: A lightweight, extensible programming language"
+PKG_LONGDESC="Lua is a powerful light-weight programming language designed for extending applications. Lua is also frequently used as a general-purpose, stand-alone language."
+PKG_IS_ADDON="no"
 
-mkdir -p $INSTALL/usr/share/xbmc/addons/skin.confluence
-  cp -R $PKG_BUILD/*/ $INSTALL/usr/share/xbmc/addons/skin.confluence
-  cp $PKG_BUILD/*.txt $INSTALL/usr/share/xbmc/addons/skin.confluence
-  cp $PKG_BUILD/*.xml $INSTALL/usr/share/xbmc/addons/skin.confluence
-  cp $PKG_BUILD/*.png $INSTALL/usr/share/xbmc/addons/skin.confluence
-  rm -rf $INSTALL/usr/share/xbmc/addons/skin.confluence/media
+PKG_AUTORECONF="no"
 
-mkdir -p $INSTALL/usr/share/xbmc/addons/skin.confluence/media
-  cp $PKG_BUILD/Textures.xbt $INSTALL/usr/share/xbmc/addons/skin.confluence/media
-
-if [ "$SPOTIFY_SUPPORT" = yes ]; then
-  mkdir -p $INSTALL/usr/share/xbmc/addons/skin.confluence/media/flagging
-  mkdir -p $INSTALL/usr/share/xbmc/addons/skin.confluence/media/flagging/audio
-  cp $PKG_DIR/spotify/spotify.png \
-  $INSTALL/usr/share/xbmc/addons/skin.confluence/media/flagging/audio/spotify.png
-fi
+PKG_MAINTAINER="unofficial.addon.pro"
