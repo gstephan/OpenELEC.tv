@@ -70,13 +70,6 @@ if [ "$SPOTIFY_SUPPORT" = yes ]; then
     ln -sf libspotify.so.$PKG_VERSION libspotify.so
   fi
 
-  if [ `echo $PKG_VERSION | cut -d. -f1` = 12 ]; then
-    cp $BUILD/$LIBSPOTIFY_FOLDERNAME/lib/libspotify.so.12  $BUILD/toolchain/$TARGET_NAME/sysroot/usr/lib/libspotify.so.$PKG_VERSION
-    cd $BUILD/toolchain/$TARGET_NAME/sysroot/usr/lib/
-    ln -sf libspotify.so.$PKG_VERSION libspotify.so.12
-    ln -sf libspotify.so.$PKG_VERSION libspotify.so
-  fi
-
   mkdir -p pkgconfig
   cd pkgconfig
 # TODO, -fix echo cheating-, libspotify.pc exists in the downloaded libspotify-tarball and should be used

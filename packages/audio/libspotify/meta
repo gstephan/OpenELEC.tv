@@ -19,14 +19,7 @@
 #################################################################################
 
 PKG_NAME="libspotify"
-
-if [ "$TARGET_ARCH" = arm ]; then
-  PKG_VERSION="12.1.103"
-else
-  PKG_VERSION="10.1.16"
-  #PKG_VERSION="12.1.51"
-fi
-
+PKG_VERSION="10.1.16"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
@@ -60,15 +53,9 @@ if [ "$TARGET_ARCH" = arm ]; then
     LIBSPOTIFY_FOLDERNAME="$PKG_NAME-Linux-armv7-release"
   fi
   if [ "$TARGET_CPU" = arm1176jzf-s ]; then
-    if [ "$PKG_VERSION" = 12.1.103 ]; then
-      PKG_URL="https://developer.spotify.com/download/libspotify/$PKG_NAME-$PKG_VERSION-Linux-armv6-bcm2708hardfp-release.tar.gz"
-    else
-      PKG_URL="http://developer.spotify.com/download/libspotify/$PKG_NAME-$PKG_VERSION-Linux-armv6-release.tar.gz"
-    fi
-
+    PKG_URL="http://developer.spotify.com/download/libspotify/$PKG_NAME-$PKG_VERSION-Linux-armv6-release.tar.gz"
     LIBSPOTIFY_FOLDERNAME="$PKG_NAME-Linux-armv6-release"
   fi
-
 fi
 
 PKG_DEPENDS=""

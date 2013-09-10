@@ -99,6 +99,13 @@ makeinstall_host() {
   cp -PR extra/comp_err $ROOT/$TOOLCHAIN/bin/mysql-comp_err
 }
 
+pre_configure_target() {
+  # need for libspotify library on RPi
+  if [ "$PROJECT" == "RPi" ]; then
+    strip_gold
+  fi
+}
+
 post_makeinstall_target() {
   sed -i "s|pkgincludedir=.*|pkgincludedir=\'$SYSROOT_PREFIX/usr/include/mysql\'|" scripts/mysql_config
   sed -i "s|pkglibdir=.*|pkglibdir=\'$SYSROOT_PREFIX/usr/lib/mysql\'|" scripts/mysql_config

@@ -250,6 +250,7 @@ if [ "$SPOTIFY_SUPPORT" = yes ]; then
   PKG_DEPENDS="$PKG_DEPENDS libspotify"
   if [ ! "$BOOTLOADER" = bcm2835-bootloader ]; then
   # Skip Ramdisk on Raspberry Pi that have small RAM
+  PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET lsyncd rsync-3"
   PKG_DEPENDS="$PKG_DEPENDS lsyncd rsync-3"
   fi
 fi
@@ -443,6 +444,8 @@ pre_configure_target() {
 
   # reduce GCC compile optimization when building xbmc with spotify support.
   if [ "$SPOTIFY_SUPPORT" = yes ]; then
+    # need for libspotify library on RPi 
+    [ "$PROJECT" == "RPi" ] && strip_gold
     export CXXFLAGS=`echo $CXXFLAGS | sed -e "s| -Ofast| -O3|"`
     export CXXFLAGS=`echo $CXXFLAGS | sed -e "s| -ffast-math||"`
   # if xbmc.bin is compiled with -ffast-math and spotyxbmc addon is enabled,
