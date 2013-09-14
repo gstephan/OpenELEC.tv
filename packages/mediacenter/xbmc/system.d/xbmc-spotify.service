@@ -1,0 +1,13 @@
+[Unit]
+Description=XBMC spotify start script
+Before=xbmc.service
+After=graphical.target
+
+[Service]
+Type=oneshot
+Environment=HOME=/storage
+ExecStart=-/bin/sh -c 'if [ -x /storage/.config/start_spotify ]; then /storage/.config/start_spotify ; else /usr/share/misc/start_spotify ; fi'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=xbmc.service

@@ -245,6 +245,16 @@ else
   XBMC_AFP="--disable-afpclient"
 fi
 
+if [ "$SPOTIFY_SUPPORT" = yes ]; then
+  PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET libspotify"
+  PKG_DEPENDS="$PKG_DEPENDS libspotify"
+  if [ ! "$BOOTLOADER" = bcm2835-bootloader ]; then
+  # Skip Ramdisk on Raspberry Pi that have small RAM
+  PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET lsyncd rsync-3"
+  PKG_DEPENDS="$PKG_DEPENDS lsyncd rsync-3"
+  fi
+fi
+
 if [ "$SAMBA_SUPPORT" = yes ]; then
   PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET samba"
   PKG_DEPENDS="$PKG_DEPENDS samba"
@@ -417,6 +427,8 @@ pre_build_target() {
 
 # autoreconf
   BOOTSTRAP_STANDALONE=1 make -C $PKG_BUILD -f bootstrap.mk
+  
+  [ -f $PKG_DIR/appkey.h ] && cp $PKG_DIR/appkey.h $ROOT/$PKG_BUILD/
 }
 
 pre_configure_target() {
@@ -429,13 +441,23 @@ pre_configure_target() {
 
 # Todo: XBMC segfaults on exit when building with LTO support
   strip_lto
-
+  
 # dont build parallel
 # MAKEFLAGS=-j1
 
   export CFLAGS="$CFLAGS $XBMC_CFLAGS"
   export CXXFLAGS="$CXXFLAGS $XBMC_CXXFLAGS"
   export LIBS="$LIBS $XBMC_LIBS"
+
+  # reduce GCC compile optimization when building xbmc with spotify support.
+  if [ "$SPOTIFY_SUPPORT" = yes ]; then
+    # need for libspotify library on RPi 
+    [ "$PROJECT" == "RPi" ] && strip_gold
+    export CXXFLAGS=`echo $CXXFLAGS | sed -e "s| -Ofast| -O3|"`
+    export CXXFLAGS=`echo $CXXFLAGS | sed -e "s| -ffast-math||"`
+  # if xbmc.bin is compiled with -ffast-math and spotyxbmc addon is enabled,
+  # xbmc often crashes within a few seconds after xbmc gui have started.
+  fi
 }
 
 make_target() {
@@ -466,6 +488,14 @@ post_makeinstall_target() {
     cp $PKG_DIR/scripts/xbmc-sources $INSTALL/usr/lib/xbmc
 
   mkdir -p $INSTALL/usr/bin
+
+  if [ ! $PROJECT = RPi ]; then
+    # Raspberry Pi does not have enough RAM for ramdisk.
+    mkdir -p $INSTALL/usr/share/misc
+    cp $PKG_DIR/scripts/start_spotify $INSTALL/usr/share/misc
+  fi
+  cp $PKG_DIR/scripts/enable_xbmc_start_delay $INSTALL/usr/bin
+
     cp $PKG_DIR/scripts/cputemp $INSTALL/usr/bin
     cp $PKG_DIR/scripts/gputemp $INSTALL/usr/bin
     cp $PKG_DIR/scripts/setwakeup.sh $INSTALL/usr/bin
@@ -498,6 +528,10 @@ post_makeinstall_target() {
     $SED "s|@OS_VERSION@|$OS_VERSION|g" -i $INSTALL/usr/share/xbmc/addons/os.openelec.tv/addon.xml
     cp -R $PKG_DIR/config/repository.openelec.tv $INSTALL/usr/share/xbmc/addons
     $SED "s|@ADDON_URL@|$ADDON_URL|g" -i $INSTALL/usr/share/xbmc/addons/repository.openelec.tv/addon.xml
+
+  if [ "$SPOTIFY_SUPPORT" = yes ]; then
+    cp -R $PKG_DIR/config/plugin.music.spotyXBMC $INSTALL/usr/share/xbmc/addons
+  fi
 
   mkdir -p $INSTALL/usr/lib/python"$PYTHON_VERSION"/site-packages/xbmc
     cp -R tools/EventClients/lib/python/* $INSTALL/usr/lib/python"$PYTHON_VERSION"/site-packages/xbmc
@@ -537,6 +571,10 @@ post_makeinstall_target() {
 post_install() {
 # link default.target to xbmc.target
   ln -sf xbmc.target $INSTALL/lib/systemd/system/default.target
+
+  if [ "$SPOTIFY_SUPPORT" = yes ]; then
+    enable_service xbmc-spotify.service
+  fi
 
   enable_service xbmc-autostart.service
   enable_service xbmc-cleanlogs.service

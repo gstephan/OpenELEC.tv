@@ -22,19 +22,15 @@
 
 . config/options $1
 
-mkdir -p $INSTALL/usr/share/xbmc/addons/skin.confluence
-  cp -R $PKG_BUILD/*/ $INSTALL/usr/share/xbmc/addons/skin.confluence
-  cp $PKG_BUILD/*.txt $INSTALL/usr/share/xbmc/addons/skin.confluence
-  cp $PKG_BUILD/*.xml $INSTALL/usr/share/xbmc/addons/skin.confluence
-  cp $PKG_BUILD/*.png $INSTALL/usr/share/xbmc/addons/skin.confluence
-  rm -rf $INSTALL/usr/share/xbmc/addons/skin.confluence/media
+cd $PKG_BUILD
 
-mkdir -p $INSTALL/usr/share/xbmc/addons/skin.confluence/media
-  cp $PKG_BUILD/Textures.xbt $INSTALL/usr/share/xbmc/addons/skin.confluence/media
+./configure --host=$TARGET_NAME \
+            --build=$HOST_NAME \
+            --prefix=/usr \
+            --sysconfdir=/etc \
+            --localstatedir=/var \
+            --disable-acl-support \
+            --disable-xattr-support \
 
-if [ "$SPOTIFY_SUPPORT" = yes ]; then
-  mkdir -p $INSTALL/usr/share/xbmc/addons/skin.confluence/media/flagging
-  mkdir -p $INSTALL/usr/share/xbmc/addons/skin.confluence/media/flagging/audio
-  cp $PKG_DIR/spotify/spotify.png \
-  $INSTALL/usr/share/xbmc/addons/skin.confluence/media/flagging/audio/spotify.png
-fi
+make reconfigure
+make
