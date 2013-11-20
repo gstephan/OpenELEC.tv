@@ -19,12 +19,7 @@
 ################################################################################
 
 PKG_NAME="xbmc"
-PKG_VERSION="12.2-68a881d"
-if [ "$XBMC" = "master" ]; then
-  PKG_VERSION="13.alpha-2ef8929"
-elif [ "$XBMC" = "xbmc-aml" ]; then
-  PKG_VERSION="aml-frodo-d9119f2"
-fi
+PKG_VERSION="13.alpha-cca24dd"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -217,13 +212,8 @@ else
 fi
 
 if [ "$AIRTUNES_SUPPORT" = yes ]; then
-  if [ "$XBMC" = master ]; then
-    PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET libshairplay"
-    PKG_DEPENDS="$PKG_DEPENDS libshairplay"
-  else
-    PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET libshairport"
-    PKG_DEPENDS="$PKG_DEPENDS libshairport"
-  fi
+  PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET libshairplay"
+  PKG_DEPENDS="$PKG_DEPENDS libshairplay"
   XBMC_AIRTUNES="--enable-airtunes"
 else
   XBMC_AIRTUNES="--disable-airtunes"
@@ -259,7 +249,6 @@ if [ "$SAMBA_SUPPORT" = yes ]; then
   PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET samba"
   PKG_DEPENDS="$PKG_DEPENDS samba"
   XBMC_SAMBA="--enable-samba"
-  XBMC_LIBS="$XBMC_LIBS -ltalloc -ltdb -ltevent -lwbclient"
 else
   XBMC_SAMBA="--disable-samba"
 fi
@@ -295,20 +284,6 @@ if [ ! "$XBMCPLAYER_DRIVER" = default ]; then
                       -I$SYSROOT_PREFIX/usr/include/interface/vmcs_host/linux"
     XBMC_CFLAGS="$XBMC_CFLAGS $BCM2835_INCLUDES"
     XBMC_CXXFLAGS="$XBMC_CXXFLAGS $BCM2835_INCLUDES"
-  elif [ "$XBMCPLAYER_DRIVER" = "marvell-libgfx" ]; then
-    PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET marvell-ipp"
-    PKG_DEPENDS="$PKG_DEPENDS marvell-ipp"
-    XBMC_OPENMAX="--disable-openmax"
-    XBMC_PLAYER="--with-platform=marvell-dove"
-    XBMC_CODEC=""
-  elif [ "$XBMCPLAYER_DRIVER" = "libamlplayer-m1" -o "$XBMCPLAYER_DRIVER" = "libamlplayer-m3" ]; then
-    XBMC_OPENMAX="--disable-openmax"
-    XBMC_PLAYER="--enable-player=amlplayer"
-    XBMC_CODEC="--enable-codec=amcodec"
-    AMLPLAYER_INCLUDES="-I$SYSROOT_PREFIX/usr/include/amlplayer"
-    XBMC_CFLAGS="$XBMC_CFLAGS $AMLPLAYER_INCLUDES"
-    XBMC_CXXFLAGS="$XBMC_CXXFLAGS $AMLPLAYER_INCLUDES"
-
   else
     XBMC_OPENMAX="--disable-openmax"
   fi
@@ -328,20 +303,6 @@ if [ "$VAAPI" = yes ]; then
   XBMC_VAAPI="--enable-vaapi"
 else
   XBMC_VAAPI="--disable-vaapi"
-fi
-
-if [ "$XVBA" = yes ]; then
-  get_graphicdrivers
-  for drv in $GRAPHIC_DRIVERS; do
-    if [ "$drv" = "fglrx" ]; then
-      PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET xf86-video-fglrx"
-    elif [ "$drv" = "fglrx-legacy" ]; then
-      PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET xf86-video-fglrx-legacy"
-    fi
-  done
-  XBMC_XVBA="--enable-xvba"
-else
-  XBMC_XVBA="--disable-xvba"
 fi
 
 if [ "$CRYSTALHD" = yes ]; then
@@ -376,7 +337,7 @@ PKG_CONFIGURE_OPTS_TARGET="gl_cv_func_gettimeofday_clobber=no \
                            $XBMC_VDPAU \
                            $XBMC_VAAPI \
                            $XBMC_CRYSTALHD \
-                           $XBMC_XVBA \
+                           --disable-xvba \
                            --disable-vdadecoder \
                            --disable-vtbdecoder \
                            --disable-tegra \
@@ -427,7 +388,7 @@ pre_build_target() {
 
 # autoreconf
   BOOTSTRAP_STANDALONE=1 make -C $PKG_BUILD -f bootstrap.mk
-  
+
   [ -f $PKG_DIR/appkey.h ] && cp $PKG_DIR/appkey.h $ROOT/$PKG_BUILD/
 }
 
@@ -441,9 +402,9 @@ pre_configure_target() {
 
 # Todo: XBMC segfaults on exit when building with LTO support
   strip_lto
-  
-# dont build parallel
-# MAKEFLAGS=-j1
+
+# xbmc fails to build with more then 4 cores
+  MAKEFLAGS=-j4
 
   export CFLAGS="$CFLAGS $XBMC_CFLAGS"
   export CXXFLAGS="$CXXFLAGS $XBMC_CXXFLAGS"
@@ -521,6 +482,7 @@ post_makeinstall_target() {
   rm -rf $INSTALL/usr/share/xbmc/addons/visualization.dxspectrum
   rm -rf $INSTALL/usr/share/xbmc/addons/visualization.itunes
   rm -rf $INSTALL/usr/share/xbmc/addons/visualization.milkdrop
+  rm -rf $INSTALL/usr/share/xbmc/addons/service.xbmc.versioncheck
   rm -rf $INSTALL/usr/share/xsessions
 
   mkdir -p $INSTALL/usr/share/xbmc/addons
@@ -553,14 +515,12 @@ post_makeinstall_target() {
       cp $PKG_DIR/config/advancedsettings.xml $INSTALL/usr/share/xbmc/system/
     fi
 
-  if [ "$XBMC" = master ]; then
-    mkdir -p $INSTALL/usr/share/xbmc/system/settings
-      if [ -f $PROJECT_DIR/$PROJECT/xbmc/appliance.xml ]; then
-        cp $PROJECT_DIR/$PROJECT/xbmc/appliance.xml $INSTALL/usr/share/xbmc/system/settings
-      else
-        cp $PKG_DIR/config/appliance.xml $INSTALL/usr/share/xbmc/system/settings
-      fi
-  fi
+  mkdir -p $INSTALL/usr/share/xbmc/system/settings
+    if [ -f $PROJECT_DIR/$PROJECT/xbmc/appliance.xml ]; then
+      cp $PROJECT_DIR/$PROJECT/xbmc/appliance.xml $INSTALL/usr/share/xbmc/system/settings
+    else
+      cp $PKG_DIR/config/appliance.xml $INSTALL/usr/share/xbmc/system/settings
+    fi
 
   if [ "$XBMC_EXTRA_FONTS" = yes ]; then
     mkdir -p $INSTALL/usr/share/xbmc/media/Fonts
