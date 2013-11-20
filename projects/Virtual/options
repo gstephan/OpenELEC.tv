@@ -92,7 +92,7 @@
 # Bootloader to use (syslinux / u-boot / atv-bootloader)
   BOOTLOADER="syslinux"
 
-# u-boot version to use (default / aml / cubox)
+# u-boot version to use (default)
   UBOOT_VERSION="default"
 
 # Configuration for u-boot
@@ -106,7 +106,6 @@
 
 # Kernel to use. values can be:
 # default:  default mainline kernel
-# ti-omap4: Ti's OMAP4 kernel
   LINUX="default"
 
 # use linux-next (latest rc) instead latest released version
@@ -162,7 +161,7 @@
 # for a list of additinoal drivers see packages/linux-drivers
 # Space separated list is supported,
 # e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
-  ADDITIONAL_DRIVERS="RTL8192CU RTL8188EU vboxguest dvbhdhomerun"
+  ADDITIONAL_DRIVERS="vboxguest dvbhdhomerun"
 
 # build with network support (yes / no)
   NETWORK="yes"
@@ -198,7 +197,7 @@
   NFS_SUPPORT="yes"
 
 # build with afpfs-ng support (mounting AFP shares with XBMC) (yes / no)
-  AFP_SUPPORT="yes"
+  AFP_SUPPORT="no"
 
 # enable spotify support, requires appkey and valid, paid premium account (yes / no)
 ####################################################################################
@@ -227,9 +226,6 @@
 # mediacenter also automount internally drives at boottime via udev (yes / no)
   UDEVIL="yes"
 
-# build and install parted support (yes / no)
-  PARTED="yes"
-
 # build and install exFAT fuse support (yes / no)
   EXFAT="yes"
 
@@ -237,7 +233,7 @@
   NTFS3G="yes"
 
 # build and install hfs filesystem utilities (yes / no)
-  HFSTOOLS="yes"
+  HFSTOOLS="no"
 
 # OpenGL(X) implementation to use (no / Mesa)
   OPENGL="Mesa"
@@ -248,15 +244,18 @@
 # Windowmanager to use (ratpoison / none)
   WINDOWMANAGER="ratpoison"
 
+# include uvesafb support (yes / no)
+  UVESAFB_SUPPORT="yes"
+
 # Displayserver to use (xorg-server / no)
   DISPLAYSERVER="xorg-server"
 
-# Xorg Graphic drivers to use (all / i915,i965,r200,r300,r600,fglrx,nvidia,nouveau,vmware,virtualbox)
+# Xorg Graphic drivers to use (all / i915,i965,r200,r300,r600,nvidia,nouveau,vmware,virtualbox)
 # Space separated list is supported,
 # e.g. GRAPHIC_DRIVERS="i915 i965 r300 r600 radeon nvidia nouveau"
   GRAPHIC_DRIVERS="vmware virtualbox"
 
-# XBMC Player implementation to use (default / bcm2835-driver / libamlplayer-m3)
+# XBMC Player implementation to use (default)
   XBMCPLAYER_DRIVER="default"
 
 # Use VDPAU video acceleration (needs nVidia driver and a supported card)
@@ -264,9 +263,6 @@
 
 # Use VAAPI video acceleration (needs intel i965 driver and a supported card)
   VAAPI="no"
-
-# Use XVBA video acceleration (needs AMD fglrx driver and a supported card)
-  XVBA="no"
 
 # Use Broadcom CrystalHD Decoder Card for video acceleration 
 # (needs Kernelsupport for Broadcom Decoder Card and a supported card)
@@ -279,16 +275,16 @@
   ATVCLIENT_SUPPORT="no"
 
 # build and install IRServer IR/LCD support (yes / no)
-  IRSERVER_SUPPORT="yes"
+  IRSERVER_SUPPORT="no"
 
 # build and install Joystick support (yes / no)
-  JOYSTICK_SUPPORT="yes"
+  JOYSTICK_SUPPORT="no"
 
 # build and install CEC adapter support (yes / no)
-  CEC_SUPPORT="yes"
+  CEC_SUPPORT="no"
 
 # build and install iSCSI support - iscsistart (yes / no)
-  ISCSI_SUPPORT="yes"
+  ISCSI_SUPPORT="no"
 
 # LCD driver to Use - Possible drivers are ( Comma seperated:
 # bayrad,CFontz,CFontz633,CFontzPacket,curses,CwLnx,dm140,
@@ -301,10 +297,10 @@
 # 'all' compiles all drivers;
 # 'all,!xxx,!yyy' de-selects previously selected drivers
 # "none" for disable LCD support
-  LCD_DRIVER="irtrans,imon,imonlcd,mdm166a,MtxOrb,lis,dm140,hd44780,CFontz,SureElec,vlsys_m428"
+  LCD_DRIVER="none"
 
 # Modules to install in initramfs for early boot
-  INITRAMFS_MODULES="uvesafb xhci-hcd"
+  INITRAMFS_MODULES="xhci-hcd"
 
 # additional Firmware to use (dvb-firmware, misc-firmware, wlan-firmware)
 # Space separated list is supported,

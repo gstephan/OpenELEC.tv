@@ -19,10 +19,7 @@
 ################################################################################
 
 PKG_NAME="ffmpeg"
-PKG_VERSION="0.10.7"
-if [ "$XBMC" = "master" ]; then
-  PKG_VERSION="1.2.3"
-fi
+PKG_VERSION="1.2.3"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
@@ -48,15 +45,3 @@ if [ "$VDPAU" = yes ]; then
   PKG_DEPENDS="$PKG_DEPENDS libvdpau"
 fi
 
-if [ "$XVBA" = yes ]; then
-  get_graphicdrivers
-  for drv in $GRAPHIC_DRIVERS; do
-    if [ "$drv" = "fglrx" ]; then
-      PKG_DEPENDS="$PKG_DEPENDS xf86-video-fglrx"
-      PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET xf86-video-fglrx"
-    elif [ "$drv" = "fglrx-legacy" ]; then
-      PKG_DEPENDS="$PKG_DEPENDS xf86-video-fglrx-legacy"
-      PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET xf86-video-fglrx-legacy"
-    fi
-  done
-fi

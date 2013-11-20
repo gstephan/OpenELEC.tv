@@ -19,10 +19,7 @@
 ################################################################################
 
 PKG_NAME="xbmc-pvr-addons"
-PKG_VERSION="frodo-910d7e7"
-if [ "$XBMC" = "master" ]; then
-  PKG_VERSION="18597fd"
-fi
+PKG_VERSION="d4cb4d5"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"

@@ -27,13 +27,14 @@ cd $PKG_BUILD
 setup_toolchain host
 
 mkdir -p .build-host && cd .build-host
+
 ../configure --host=$HOST_NAME \
             --build=$HOST_NAME \
             --prefix=$ROOT/$TOOLCHAIN \
             --disable-static \
             --enable-shared \
+            --disable-unittest \
             --with-server=no \
-            --with-cgi=no \
             --with-sdk=yes \
             --with-demos=no \
             --with-epoll=yes \
@@ -57,11 +58,13 @@ mkdir -p .build-target && cd .build-target
             --sysconfdir=/etc \
             --disable-static \
             --enable-shared \
+            --disable-unittest \
+            --with-sysroot=$SYSROOT_PREFIX \
             --with-server=no \
-            --with-cgi=no \
-            --with-sdk=yes \
+            --with-sdk=no \
             --with-demos=no \
             --with-epoll=yes \
+            --with-ssl=no \
             --with-stressjob=no
 
 $MAKEINSTALL

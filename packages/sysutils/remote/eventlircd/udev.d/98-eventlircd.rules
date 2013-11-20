@@ -147,6 +147,10 @@ ENV{ID_VENDOR_ID}=="18b1", ENV{ID_MODEL_ID}=="0037", \
   ENV{eventlircd_enable}="true", \
   ENV{eventlircd_evmap}="03_$env{ID_VENDOR_ID}_$env{ID_MODEL_ID}.evmap"
 
+ENV{ID_VENDOR_ID}=="1d57", ENV{ID_MODEL_ID}=="ac01", \
+  ENV{eventlircd_enable}="true", \
+  ENV{eventlircd_evmap}="03_$env{ID_VENDOR_ID}_$env{ID_MODEL_ID}.evmap"
+
 #ENV{ID_VENDOR_ID}=="9022", ENV{ID_MODEL_ID}=="d660", \
 ATTRS{idVendor}=="9022", ATTRS{idProduct}=="d660", \
   ENV{eventlircd_enable}="true", \
@@ -164,11 +168,13 @@ ENV{ID_VENDOR_ID}=="0471", ENV{ID_MODEL_ID}=="20cc", \
   ENV{eventlircd_enable}="true", \
   ENV{eventlircd_evmap}="spinelplus.evmap"
 
-
 # Enable wake-on-usb for the USB remotes.
   RUN+="wakeup_enable"
 
 LABEL="end-usb"
+
+# Set default delays (1000ms for first repeat, to avoid multiple keypresses).
+  RUN+="/usr/bin/ir-keytable --delay=1000 --device=$devnode"
 
 #-------------------------------------------------------------------------------
 # Ask eventlircd to handle Bluetooth HID devices that show up as event devices
@@ -186,7 +192,7 @@ ATTRS{name}=="Nintendo Wii Remote", \
 ATTRS{name}=="BD Remote Control", \
   ENV{eventlircd_enable}="true", \
   ENV{eventlircd_evmap}="ps3remote.evmap"
-  
+
 ATTRS{name}=="OUYA Game Controller", \
   ENV{eventlircd_enable}="true", \
   ENV{eventlircd_evmap}="ouya.evmap"

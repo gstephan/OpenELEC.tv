@@ -9,11 +9,10 @@ Environment=SDL_MOUSE_RELATIVE=0
 Environment=HOME=/storage
 EnvironmentFile=-/run/openelec/xbmc.conf
 EnvironmentFile=-/run/openelec/debug/xbmc.conf
-ExecStart=/usr/lib/xbmc/xbmc.bin --standalone -fs $XBMC_ARGS $XBMC_DEBUG
-KillMode=process
+ExecStart=/bin/sh -c ". /etc/profile; exec /usr/lib/xbmc/xbmc.bin --standalone -fs $XBMC_ARGS $XBMC_DEBUG"
+TimeoutStopSec=10
 Restart=always
-### TODO: remove this
-RestartSec=1
+RestartSec=2
 StartLimitInterval=0
 
 [Install]

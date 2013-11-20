@@ -41,7 +41,7 @@
       #               i686 i586 i486 i386
       # (VIA CPUs)    c3 c3-2
       #
-      TARGET_CPU="pentium-m"
+      TARGET_CPU="i686"
       ;;
 
     x86_64)
@@ -86,7 +86,7 @@
   OPTIMIZATIONS="size"
 
 # Project CFLAGS
-  PROJECT_CFLAGS=""
+  PROJECT_CFLAGS="-mmmx -msse -msse2 -mfpmath=sse"
 
 # LTO (Link Time Optimization) support
   LTO_SUPPORT="yes"
@@ -97,7 +97,7 @@
 # Bootloader to use (syslinux / u-boot / atv-bootloader)
   BOOTLOADER="atv-bootloader"
 
-# u-boot version to use (default / aml / cubox)
+# u-boot version to use (default)
   UBOOT_VERSION="default"
 
 # Configuration for u-boot
@@ -111,7 +111,6 @@
 
 # Kernel to use. values can be:
 # default:  default mainline kernel
-# ti-omap4: Ti's OMAP4 kernel
   LINUX="default"
 
 # use linux-next (latest rc) instead latest released version
@@ -232,9 +231,6 @@
 # mediacenter also automount internally drives at boottime via udev (yes / no)
   UDEVIL="yes"
 
-# build and install parted support (yes / no)
-  PARTED="yes"
-
 # build and install exFAT fuse support (yes / no)
   EXFAT="yes"
 
@@ -253,15 +249,18 @@
 # Windowmanager to use (ratpoison / none)
   WINDOWMANAGER="ratpoison"
 
+# include uvesafb support (yes / no)
+  UVESAFB_SUPPORT="no"
+
 # Displayserver to use (xorg-server / no)
   DISPLAYSERVER="xorg-server"
 
-# Xorg Graphic drivers to use (all / i915,i965,r200,r300,r600,fglrx,nvidia,nouveau,vmware)
+# Xorg Graphic drivers to use (all / i915,i965,r200,r300,r600,nvidia,nouveau,vmware)
 # Space separated list is supported,
 # e.g. GRAPHIC_DRIVERS="i915 i965 r300 r600 radeon nvidia nouveau"
   GRAPHIC_DRIVERS="nvidia-legacy"
 
-# XBMC Player implementation to use (default / bcm2835-driver / libamlplayer-m3)
+# XBMC Player implementation to use (default / bcm2835-driver)
   XBMCPLAYER_DRIVER="default"
 
 # Use VDPAU video acceleration (needs nVidia driver and a supported card)
@@ -269,9 +268,6 @@
 
 # Use VAAPI video acceleration (needs intel i965 driver and a supported card)
   VAAPI="no"
-
-# Use XVBA video acceleration (needs AMD fglrx driver and a supported card)
-  XVBA="no"
 
 # Use Broadcom CrystalHD Decoder Card for video acceleration 
 # (needs Kernelsupport for Broadcom Decoder Card and a supported card)

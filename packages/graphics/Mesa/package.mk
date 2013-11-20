@@ -19,12 +19,12 @@
 ################################################################################
 
 PKG_NAME="Mesa"
-PKG_VERSION="9.2.0"
+PKG_VERSION="10.0.0-rc1"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
-PKG_URL="ftp://freedesktop.org/pub/mesa/9.2/MesaLib-$PKG_VERSION.tar.bz2"
+PKG_URL="ftp://freedesktop.org/pub/mesa/10.0/MesaLib-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS="libXdamage libdrm expat libXext libXfixes libX11"
 PKG_BUILD_DEPENDS_TARGET="toolchain Python-host makedepend:host libxml2-host expat glproto dri2proto libdrm libXext libXdamage libXfixes libXxf86vm libxcb libX11"
 PKG_PRIORITY="optional"
@@ -41,13 +41,13 @@ PKG_AUTORECONF="yes"
 if [ "$LLVM_SUPPORT" = "yes" ]; then
   PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET llvm"
   PKG_DEPENDS="$PKG_DEPENDS llvm"
-  export LLVM_CONFIG="$SYSROOT_PREFIX/usr/bin/llvm-config"
+  export LLVM_CONFIG="$SYSROOT_PREFIX/usr/bin/llvm-config-host"
   MESA_GALLIUM_LLVM="--enable-gallium-llvm --with-llvm-shared-libs"
 else
   MESA_GALLIUM_LLVM="--disable-gallium-llvm"
 fi
 
-if [ "$MESA_VDPAU_SUPPORT" = "yes" ]; then
+if [ "$VDPAU" = "yes" ]; then
   PKG_BUILD_DEPENDS_TARGET="$PKG_BUILD_DEPENDS_TARGET libvdpau"
   PKG_DEPENDS="$PKG_DEPENDS libvdpau"
   MESA_VDPAU="--enable-vdpau"
@@ -78,18 +78,18 @@ PKG_CONFIGURE_OPTS_TARGET="CC_FOR_BUILD=$HOST_CC \
                            --enable-asm \
                            --disable-selinux \
                            --enable-opengl \
-                           --enable-glx-tls \
                            --enable-driglx-direct \
                            --disable-gles1 \
                            --disable-gles2 \
                            --disable-openvg \
                            --enable-dri \
+                           --disable-dri3 \
                            --enable-glx \
                            --disable-osmesa \
-                           --disable-egl \
+                           --enable-egl --with-egl-platforms=x11,drm \
                            --disable-xorg \
                            $XA_CONFIG \
-                           --disable-gbm \
+                           --enable-gbm \
                            --disable-xvmc \
                            $MESA_VDPAU \
                            --disable-opencl \
@@ -99,7 +99,7 @@ PKG_CONFIGURE_OPTS_TARGET="CC_FOR_BUILD=$HOST_CC \
                            --disable-r600-llvm-compiler \
                            --disable-gallium-tests \
                            --enable-shared-glapi \
-                           --disable-glx-tls \
+                           --enable-glx-tls \
                            --disable-gallium-g3dvl \
                            $MESA_GALLIUM_LLVM \
                            --disable-silent-rules \
@@ -108,6 +108,12 @@ PKG_CONFIGURE_OPTS_TARGET="CC_FOR_BUILD=$HOST_CC \
                            --with-gallium-drivers=$GALLIUM_DRIVERS \
                            --with-dri-drivers=$DRI_DRIVERS \
                            --with-expat=$SYSROOT_PREFIX/usr"
+
+
+pre_configure_target() {
+  # Mesa fails to build with GOLD if we build with --enable-glx-tls
+  strip_gold
+}
 
 post_makeinstall_target() {
   # rename and relink for cooperate with nvidia drivers

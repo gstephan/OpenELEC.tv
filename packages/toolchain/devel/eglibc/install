@@ -50,6 +50,8 @@ mkdir -p $INSTALL/usr/bin
   cp $PKG_BUILD/objdir-$1/elf/ldd $INSTALL/usr/bin
   sed -i 's%/usr/bin/bash%/bin/sh%g' $INSTALL/usr/bin/ldd
 
+  cp $PKG_BUILD/objdir-$1/nss/getent $INSTALL/usr/bin
+
   cp $PKG_BUILD/objdir-$1/locale/locale $INSTALL/usr/bin
 
 # libiconv replacement:
@@ -59,5 +61,6 @@ mkdir -p $INSTALL/usr/bin
 
 mkdir -p $INSTALL/etc
   cp $PKG_DIR/config/nsswitch.conf $INSTALL/etc
+  cp $PKG_DIR/config/host.conf $INSTALL/etc
   cp $PKG_DIR/config/gai.conf $INSTALL/etc
   cp $PKG_BUILD/sunrpc/etc.rpc $INSTALL/etc/rpc

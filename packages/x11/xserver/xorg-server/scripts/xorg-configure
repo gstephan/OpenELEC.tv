@@ -24,10 +24,17 @@
 # creating needed directories and symlinks
 ################################################################################
 
-logger -t Xorg "creating needed directories and symlinks for driver: "$1""
+mkdir -p /var/lib
+mkdir -p /var/run
 
-  mkdir -p /var/lib
-  mkdir -p /var/run
+# HACK. we have xorg-configure@%. so nice race
+# can happen on multi-gpu setups
+if [ -e /var/run/xorg-configure.done ] ; then
+  exit 0
+fi
+
+touch /var/run/xorg-configure.done
+logger -t Xorg "creating needed directories and symlinks for driver: "$1""
 
 ##############################################################################
 # setup xorg.conf paths
@@ -69,14 +76,6 @@ logger -t Xorg "### creating needed directories and symlinks ###"
     ln -sf /usr/lib/libGL_nvidia.so.1 /var/lib/libGL.so
     ln -sf /usr/lib/xorg/modules/extensions/libglx_nvidia.so /var/lib/libglx.so
     XORG_ARGS="$XORG_ARGS -ignoreABI"
-  elif [ "$1" = "fglrx" ]; then
-    ln -sf /usr/lib/fglrx /var/run/fglrx
-    ln -sf /usr/lib/libGL_fglrx.so.1 /var/lib/libGL.so
-    ln -sf /usr/lib/xorg/modules/extensions/libglx_fglrx.so /var/lib/libglx.so
-  elif [ "$1" = "fglrx-legacy" ]; then
-    ln -sf /usr/lib/fglrx-legacy /var/run/fglrx
-    ln -sf /usr/lib/libGL_fglrx.so.1 /var/lib/libGL.so
-    ln -sf /usr/lib/xorg/modules/extensions/libglx_fglrx.so /var/lib/libglx.so
   else
     ln -sf /usr/lib/libGL_mesa.so.1 /var/lib/libGL.so
     ln -sf /usr/lib/xorg/modules/extensions/libglx_mesa.so /var/lib/libglx.so

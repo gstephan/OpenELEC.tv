@@ -19,7 +19,7 @@
 ################################################################################
 
 PKG_NAME="bcm2835-driver"
-PKG_VERSION="7d8a762"
+PKG_VERSION="1100e2a"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="nonfree"
@@ -78,7 +78,6 @@ makeinstall_target() {
 }
 
 post_install() {
-  enable_service bcm2835-threshold.service
   enable_service fbset.service
   enable_service unbind-console.service
 }

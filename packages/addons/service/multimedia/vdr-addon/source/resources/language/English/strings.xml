@@ -17,7 +17,6 @@
 	<string id="1038">Enable plugin: live</string>
 	<string id="1039">live: listen on ip</string>
 	<string id="1040">live: listen on port</string>
-	<string id="1041">Enable plugin: rotorng</string>
 	<string id="1042">Enable plugin: control</string>
 	<string id="1043">control: listen on port</string>
 	<string id="1044">Enable plugin: epgsearch</string>
@@ -27,4 +26,6 @@
 	<string id="1053">PVR plugin</string>
 	<string id="1054">Enable dvb(sd|hd)device plugin</string>
 	<string id="1055">plugin</string>
+        <string id="1056">Enable external recdmd</string>
+        <string id="1057">External recdmd path</string>
 </strings>

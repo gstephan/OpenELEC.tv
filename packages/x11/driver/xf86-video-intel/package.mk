@@ -19,13 +19,13 @@
 ################################################################################
 
 PKG_NAME="xf86-video-intel"
-PKG_VERSION="2.99.902"
+PKG_VERSION="2.99.905"
 PKG_REV="1"
 PKG_ARCH="i386 x86_64"
 PKG_LICENSE="OSS"
 PKG_SITE="http://intellinuxgraphics.org/"
 PKG_URL="http://xorg.freedesktop.org/archive/individual/driver/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS="libXcomposite systemd intel-gpu-tools"
+PKG_DEPENDS="libXcomposite systemd"
 PKG_BUILD_DEPENDS_TARGET="toolchain libXcomposite util-macros fontsproto systemd xorg-server"
 PKG_PRIORITY="optional"
 PKG_SECTION="x11/driver"
