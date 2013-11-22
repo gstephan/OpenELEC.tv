@@ -13748,10 +13748,10 @@ index abf47bc..47fb7a4 100644
  
  bool PAPlayer::OpenFile(const CFileItem& file, const CPlayerOptions &options)
  {
--  m_defaultCrossfadeMS = g_guiSettings.GetInt("musicplayer.crossfade") * 1000;
+-  m_defaultCrossfadeMS = CSettings::Get().GetInt("musicplayer.crossfade") * 1000;
 +  if (!file.IsSpotify())
 +  {
-+    m_defaultCrossfadeMS = g_guiSettings.GetInt("musicplayer.crossfade") * 1000;
++    m_defaultCrossfadeMS = CSettings::Get().GetInt("musicplayer.crossfade") * 1000;
 +    #undef TIME_TO_CACHE_NEXT_FILE //Ensure we have default values
 +    #undef FAST_XFADE_TIME
 +    #undef MAX_SKIP_XFADE_TIME
@@ -13772,20 +13772,21 @@ index abf47bc..47fb7a4 100644
  
    if (m_streams.size() > 1 || !m_defaultCrossfadeMS || m_isPaused)
    {
-@@ -264,7 +284,12 @@ bool PAPlayer::OpenFile(const CFileItem& file, const CPlayerOptions &options)
- 
- void PAPlayer::UpdateCrossfadeTime(const CFileItem& file)
- {
--  m_upcomingCrossfadeMS = m_defaultCrossfadeMS = g_guiSettings.GetInt("musicplayer.crossfade") * 1000;
-+  if (!file.IsSpotify())
-+    m_upcomingCrossfadeMS = m_defaultCrossfadeMS = g_guiSettings.GetInt("musicplayer.crossfade") * 1000;
-+  else
+@@ -300,8 +300,13 @@
+   // we explicitely disable crossfading for audio cds
+   if(file.IsCDDA())
+    m_upcomingCrossfadeMS = 0;
+-  else
++  else if (!file.IsSpotify())
+     m_upcomingCrossfadeMS = m_defaultCrossfadeMS = CSettings::Get().GetInt("musicplayer.crossfade") * 1000;
++  else {
 +    CLog::Log(LOGDEBUG, "PAPlayer::UpdateCrossfadeTime: Spotify track detected, crossfade is disabled.");
-+  m_upcomingCrossfadeMS = m_defaultCrossfadeMS; // Spotify (spotyxbmc) can not handle crossfade
++    m_upcomingCrossfadeMS = 0; // Spotify (spotyxbmc) can not handle crossfade
++  }
 +
    if (m_upcomingCrossfadeMS)
    {
-     if (m_streams.size() == 0 ||
+     if (m_streams.size() == 0 || 
 @@ -291,6 +316,35 @@ bool PAPlayer::QueueNextFile(const CFileItem &file)
  
  bool PAPlayer::QueueNextFileEx(const CFileItem &file, bool fadeIn/* = true */)
@@ -17273,7 +17274,7 @@ index 0000000..8ce9a29
 +    };
 +
 +    if (m_Channels > 2) {
-+	  Logger::printOut("m_Channels is bigger than 2, please fix code, I can´t return a valid AEChannel map");
++	  Logger::printOut("m_Channels is bigger than 2, please fix code, I canÂ´t return a valid AEChannel map");
 +//    return CAEUtil::GuessChLayout(m_Channels);
 +    }
 +
@@ -21448,7 +21449,7 @@ index 2e7a2e9..c9e2bb8 100644
 +    //TODO scan all plugins for playlists
 +    g_spotify->GetPlaylists(items);
 +
-     CFileItemPtr newPlaylist(new CFileItem(g_settings.GetUserDataItem("PartyMode.xsp"),false));
+     CFileItemPtr newPlaylist(new CFileItem(CProfilesManager::Get().GetUserDataItem("PartyMode.xsp"),false));
      newPlaylist->SetLabel(g_localizeStrings.Get(16035));
      newPlaylist->SetLabelPreformated(true);
 diff --git a/xbmc/music/windows/GUIWindowMusicNav.cpp b/xbmc/music/windows/GUIWindowMusicNav.cpp
@@ -21467,8 +21468,8 @@ index 88c5514..efa64f3 100644
  #include "utils/URIUtils.h"
 @@ -101,12 +104,15 @@ bool CGUIWindowMusicNav::OnMessage(CGUIMessage& message)
        // is this the first time the window is opened?
-       if (m_vecItems->GetPath() == "?" && message.GetStringParam().IsEmpty())
-         message.SetStringParam(g_settings.m_defaultMusicLibSource);
+       if (m_vecItems->GetPath() == "?" && message.GetStringParam().empty())
+         message.SetStringParam(CSettings::Get().GetString("mymusic.defaultlibview"));
 -      
 -      DisplayEmptyDatabaseMessage(false); // reset message state
 +	  
@@ -21564,17 +21565,17 @@ index 88c5514..efa64f3 100644
        if (!item->IsVideoDb())
 diff --git a/xbmc/settings/Settings.cpp b/xbmc/settings/Settings.cpp
 index 79722aa..8ae344b 100644
---- a/xbmc/settings/Settings.cpp
-+++ b/xbmc/settings/Settings.cpp
-@@ -99,7 +99,7 @@ void CSettings::Initialize()
-   m_bNonLinStretch = false;
+--- a/xbmc/settings/AdvancedSettings.cpp
++++ b/xbmc/settings/AdvancedSettings.cpp
+@@ -398,7 +398,7 @@
+   m_databaseVideo.Reset();
  
-   m_pictureExtensions = ".png|.jpg|.jpeg|.bmp|.gif|.ico|.tif|.tiff|.tga|.pcx|.cbz|.zip|.cbr|.rar|.m3u|.dng|.nef|.cr2|.crw|.orf|.arw|.erf|.3fr|.dcr|.x3f|.mef|.raf|.mrw|.pef|.sr2|.rss";
+   m_pictureExtensions = ".png|.jpg|.jpeg|.bmp|.gif|.ico|.tif|.tiff|.tga|.pcx|.cbz|.zip|.cbr|.rar|.dng|.nef|.cr2|.crw|.orf|.arw|.erf|.3fr|.dcr|.x3f|.mef|.raf|.mrw|.pef|.sr2|.rss";
 -  m_musicExtensions = ".nsv|.m4a|.flac|.aac|.strm|.pls|.rm|.rma|.mpa|.wav|.wma|.ogg|.mp3|.mp2|.m3u|.mod|.amf|.669|.dmf|.dsm|.far|.gdm|.imf|.it|.m15|.med|.okt|.s3m|.stm|.sfx|.ult|.uni|.xm|.sid|.ac3|.dts|.cue|.aif|.aiff|.wpl|.ape|.mac|.mpc|.mp+|.mpp|.shn|.zip|.rar|.wv|.nsf|.spc|.gym|.adx|.dsp|.adp|.ymf|.ast|.afc|.hps|.xsp|.xwav|.waa|.wvs|.wam|.gcm|.idsp|.mpdsp|.mss|.spt|.rsd|.mid|.kar|.sap|.cmc|.cmr|.dmc|.mpt|.mpd|.rmt|.tmc|.tm8|.tm2|.oga|.url|.pxml|.tta|.rss|.cm3|.cms|.dlt|.brstm|.wtv|.mka";
 +  m_musicExtensions = ".spotify|.nsv|.m4a|.flac|.aac|.strm|.pls|.rm|.rma|.mpa|.wav|.wma|.ogg|.mp3|.mp2|.m3u|.mod|.amf|.669|.dmf|.dsm|.far|.gdm|.imf|.it|.m15|.med|.okt|.s3m|.stm|.sfx|.ult|.uni|.xm|.sid|.ac3|.dts|.cue|.aif|.aiff|.wpl|.ape|.mac|.mpc|.mp+|.mpp|.shn|.zip|.rar|.wv|.nsf|.spc|.gym|.adx|.dsp|.adp|.ymf|.ast|.afc|.hps|.xsp|.xwav|.waa|.wvs|.wam|.gcm|.idsp|.mpdsp|.mss|.spt|.rsd|.mid|.kar|.sap|.cmc|.cmr|.dmc|.mpt|.mpd|.rmt|.tmc|.tm8|.tm2|.oga|.url|.pxml|.tta|.rss|.cm3|.cms|.dlt|.brstm|.wtv|.mka";
    m_videoExtensions = ".m4v|.3g2|.3gp|.nsv|.tp|.ts|.ty|.strm|.pls|.rm|.rmvb|.m3u|.m3u8|.ifo|.mov|.qt|.divx|.xvid|.bivx|.vob|.nrg|.img|.iso|.pva|.wmv|.asf|.asx|.ogm|.m2v|.avi|.bin|.dat|.mpg|.mpeg|.mp4|.mkv|.avc|.vp3|.svq3|.nuv|.viv|.dv|.fli|.flv|.rar|.001|.wpl|.zip|.vdr|.dvr-ms|.xsp|.mts|.m2t|.m2ts|.evo|.ogv|.sdp|.avs|.rec|.url|.pxml|.vc1|.h264|.rcv|.rss|.mpls|.webm|.bdmv|.wtv";
+   m_subtitlesExtensions = ".utf|.utf8|.utf-8|.sub|.srt|.smi|.rt|.txt|.ssa|.text|.ssa|.aqt|.jss|.ass|.idx|.ifo|.rar|.zip";
    m_discStubExtensions = ".disc";
-   // internal music extensions
 -- 
 1.7.11.msysgit.1
 
