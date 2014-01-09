@@ -59,14 +59,14 @@ for type in dvbc dvbs; do
   LDFLAGS="" make DIR=$(kernel_path) prepare
 
   # linux 3.9 temp build fix (thanks seo)
-  #find . -iname *.[ch] | xargs sed -i -e "s|__devinit||"
-  #find . -iname *.[ch] | xargs sed -i -e "s|__devexit||"
-  #find . -iname *.[ch] | xargs sed -i -e "s|__devexit_p||"
+  find . -iname *.[ch] | xargs sed -i -e "s|__devinit||"
+  find . -iname *.[ch] | xargs sed -i -e "s|__devexit||"
+  find . -iname *.[ch] | xargs sed -i -e "s|__devexit_p||"
 
   # CONFIG_IR_LIRC_CODEC CONFIG_VIDEO_PVRUSB2
-  #for cfg in CONFIG_VIDEO_SH_MOBILE_CEU CONFIG_VIDEO_SH_MOBILE_CSI2; do
-  #  sed -i -e "s|^$cfg=.*$|# $cfg is not set|" v4l/.config 
-  #done
+  for cfg in CONFIG_VIDEO_SH_MOBILE_CEU CONFIG_VIDEO_SH_MOBILE_CSI2; do
+    sed -i -e "s|^$cfg=.*$|# $cfg is not set|" v4l/.config 
+  done
 
   LDFLAGS="" make DIR=$(kernel_path)
 

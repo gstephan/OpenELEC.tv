@@ -27,8 +27,12 @@
 
 install_modules() {
   TMPDIR=$ROOT/$INSTALL/lib/modules/$KVER/modules.tmp
-
-  make -C $ROOT/$BUILD/${PKG_NAME}-${PKG_VERSION} install DESTDIR=$TMPDIR >/dev/null
+echo "TMPDIR: $TMPDIR"
+echo "$ROOT/$BUILD/${PKG_NAME}-${PKG_VERSION}"
+mkdir -p "$TMPDIR"
+mkdir -p "$TMPDIR/lib/modules/$KVER"
+#mkdir -p /users/rdsa/pvic/private/OpenELEC.tv-3.2.4/build.OpenELEC-ION.x86_64-3.2.4/image/system/lib/modules/3.10.20/modules.tmp/lib/modules/3.10.20
+  make -C $ROOT/$BUILD/${PKG_NAME}-${PKG_VERSION} install DESTDIR=$TMPDIR
   rm -f $TMPDIR/lib/modules/$KVER/* || true
 
   mkdir -p $INSTALL/lib/modules/$KVER/updates
