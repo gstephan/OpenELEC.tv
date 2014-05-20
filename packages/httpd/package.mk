@@ -35,47 +35,40 @@ PKG_AUTORECONF="no"
 PKG_CONFIGURE_OPTS_COMMON="--with-pcre \
                            --enable-ssl \
                            --with-ssl \
-                           --with-z=$SYSROOT_PREFIX/usr/lib \
-                           --with-libxml2=$SYSROOT_PREFIX/usr/lib \
+                           --with-z \
+                           --with-libxml2 \
                            --enable-so \
                            --enable-mods-shared=all \
                            --with-mpm=prefork \
-                           cross_compiling=yes \
+                           cross_compiling=no \
                            apr_cv_process_shared_works=no \
                            ap_cv_void_ptr_lt_long=no \
                            ac_cv_sizeof_struct_iovec=1 \
                            apr_cv_tcp_nodelay_with_cork=no
                            ac_cv_func_setpgrp_void=no \
                            ac_cv_file__dev_zero=no"
- 
+
 # host is build before target
 pre_configure_host() {
-  # we need apr/apt-util folder so build it first (could be done better probably)
-  (
-    cd $ROOT
-    $SCRIPTS/build apr-util
-  )
-
   APR_DIR_HOST=$(ls -d $ROOT/$BUILD/apr-[0-9]*/.$HOST_NAME)
   APR_UTIL_DIR_HOST=$(ls -d $ROOT/$BUILD/apr-util-[0-9]*/.$HOST_NAME)
 
-  PKG_CONFIGURE_OPTS_HOST="--with-apr=$APR_DIR_HOST \
-                           --with-apr-util=$APR_UTIL_DIR_HOST \
-                           $PKG_CONFIGURE_OPTS_COMMON"
+  PKG_CONFIGURE_OPTS_HOST="$PKG_CONFIGURE_OPTS_COMMON \
+                           --with-apr=$APR_DIR_HOST \
+                           --with-apr-util=$APR_UTIL_DIR_HOST"
 }
 
 pre_configure_target() {
-  # If you desire to serve pages as root uncomment this:
-  # export CFLAGS="$CFLAGS -DBIG_SECURITY_HOLE"
-  
+  # If you still desire to serve pages as root
+  export CFLAGS="$CFLAGS -DBIG_SECURITY_HOLE"
   export LDFLAGS="$LDFLAGS -L$SYSROOT_PREFIX/usr/lib -lpthread"
-	  
+
   APR_DIR_TARGET=$(ls -d $ROOT/$BUILD/apr-[0-9]*/.$TARGET_NAME)
   APR_UTIL_DIR_TARGET=$(ls -d $ROOT/$BUILD/apr-util-[0-9]*/.$TARGET_NAME)
 
-  PKG_CONFIGURE_OPTS_TARGET="--with-apr=$APR_DIR_TARGET \
-                             --with-apr-util=$APR_UTIL_DIR_TARGET \
-                             $PKG_CONFIGURE_OPTS_COMMON"
+  PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_COMMON \
+                             --with-apr=$APR_DIR_TARGET \
+                             --with-apr-util=$APR_UTIL_DIR_TARGET"
 }
 
 post_configure_target() {
@@ -92,11 +85,11 @@ post_configure_host() {
   sed -i 's|./gen_test_char >|#|' server/Makefile
 }
 
-addon() { 	
-	APR_BUILD_DIR=$(ls -d $ROOT/$BUILD/apr-[0-9]*/.install_pkg)
-	APR_UTIL_BUILD_DIR=$(ls -d $ROOT/$BUILD/apr-util-[0-9]*/.install_pkg)
-	
-  	# create bin folder and add httpd, apr, apr-util binaries
+addon() {
+  APR_BUILD_DIR=$(ls -d $ROOT/$BUILD/apr-[0-9]*/.install_pkg)
+  APR_UTIL_BUILD_DIR=$(ls -d $ROOT/$BUILD/apr-util-[0-9]*/.install_pkg)
+
+    # create bin folder and add httpd, apr, apr-util binaries
     mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
     cp -PR $PKG_BUILD/.install_pkg/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
     cp -PR $PKG_BUILD/.install_pkg/usr/sbin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
@@ -108,11 +101,11 @@ addon() {
     cp -PR $PKG_BUILD/.install_pkg/usr/lib/* $ADDON_BUILD/$PKG_ADDON_ID/lib
     cp -PR $APR_BUILD_DIR/usr/lib/* $ADDON_BUILD/$PKG_ADDON_ID/lib
     cp -PR $APR_UTIL_BUILD_DIR/usr/lib/* $ADDON_BUILD/$PKG_ADDON_ID/lib
-	
-	# add php module to libs folder
-	if [ -d $ROOT/$BUILD/php-[0-9]*/.$TARGET_NAME ]; then
-		cp $ROOT/$BUILD/php-[0-9]*/.$TARGET_NAME/.libs/libphp5.so $ADDON_BUILD/$PKG_ADDON_ID/lib
-	fi
+
+  # add php module to libs folder
+  if [ -d $ROOT/$BUILD/php-[0-9]*/.$TARGET_NAME ]; then
+    cp $ROOT/$BUILD/php-[0-9]*/.$TARGET_NAME/.libs/libphp5.so $ADDON_BUILD/$PKG_ADDON_ID/lib
+  fi
 
     # add httpd www folder
     mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/www
@@ -131,8 +124,15 @@ addon() {
     cp -PR $PKG_BUILD/.install_pkg/etc/mime.types $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
     cp -PR $PKG_DIR/config/httpd.conf $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
     cp -PR $PKG_DIR/config/extra $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
-    cp -PR $PKG_DIR/config/php.ini $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf    
+
+  # add php.ini file to conf folder
+  if [ -f $ROOT/$BUILD/php-[0-9]*/php.ini-production ]; then
+    cp $ROOT/$BUILD/php-[0-9]*/php.ini-production $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf/php.ini
+  fi
 
     # add other httpd files to server root
     cp -PR $PKG_BUILD/.install_pkg/usr/error $ADDON_BUILD/$PKG_ADDON_ID/srvroot
+
+    # add httpd logs folder to server root
+    mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/srvroot/logs
 }

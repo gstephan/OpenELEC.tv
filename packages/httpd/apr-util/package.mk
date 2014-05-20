@@ -33,12 +33,6 @@ PKG_AUTORECONF="no"
 
 # host is build before target
 pre_configure_host() {
-  # we need apr folder so build it first (could be done better probably)
-  (
-    cd $ROOT
-    $SCRIPTS/build apr
-  )
- 
   APR_DIR_HOST=$(ls -d $ROOT/$BUILD/apr-[0-9]*/.$HOST_NAME)
 
   PKG_CONFIGURE_OPTS_HOST="--with-apr=$APR_DIR_HOST \
