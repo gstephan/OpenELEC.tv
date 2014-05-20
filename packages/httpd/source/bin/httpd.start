@@ -1,0 +1,31 @@
+#!/bin/sh
+
+ADDON_DIR="$HOME/.xbmc/addons/service.web.httpd"
+ADDON_HOME="$HOME/.xbmc/userdata/addon_data/service.web.httpd"
+
+# exit if already running
+PID=$(ps aux | grep "$ADDON_DIR/bin/httpd " | grep -v grep | awk '{print $1}' | sort -k1 | head -n 1)
+if [ "$PID" != "" ]; then
+	echo "Apache is already running"
+	exit 0
+fi
+
+# service setup
+. /etc/profile
+#oe_setup_addon service.web.httpd
+
+# copy files to user dir
+mkdir -p "$ADDON_HOME"
+if [ ! -d "$ADDON_HOME/www" ]; then
+	mv "$ADDON_DIR/www" "$ADDON_HOME"
+fi
+if [ ! -d "$ADDON_HOME/srvroot" ]; then
+	mv "$ADDON_DIR/srvroot" "$ADDON_HOME"
+	mkdir -p "$ADDON_HOME/srvroot/logs"
+fi
+
+# create dir for mutex
+mkdir -p /var/logs/
+
+# start httpd
+$ADDON_DIR/bin/httpd -d "$ADDON_HOME/srvroot" -f "$ADDON_HOME/srvroot/conf/httpd.conf"

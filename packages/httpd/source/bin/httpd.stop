@@ -1,0 +1,9 @@
+#!/bin/sh
+
+ADDON_DIR="$HOME/.xbmc/addons/service.web.httpd"
+ADDON_HOME="$HOME/.xbmc/userdata/addon_data/service.web.httpd"
+
+PID=$(ps aux | grep "$ADDON_DIR/bin/httpd " | grep -v grep | awk '{print $1}' | sort -k1 | head -n 1)
+if [ "$PID" != "" ]; then
+	kill -TERM $PID
+fi
