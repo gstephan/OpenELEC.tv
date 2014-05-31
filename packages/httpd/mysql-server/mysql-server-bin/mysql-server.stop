@@ -1,9 +1,0 @@
-#!/bin/sh
-
-ADDON_DIR="$HOME/.xbmc/addons/service.databases.mysql"
-ADDON_HOME="$HOME/.xbmc/userdata/addon_data/service.databases.mysql"
-
-PID=$(ps aux | grep "$ADDON_DIR/bin/mysqld " | grep -v grep | awk '{print $1}')
-if [ "$PID" != "" ]; then
-	kill -TERM $PID
-fi

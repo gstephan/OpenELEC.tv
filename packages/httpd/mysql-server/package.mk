@@ -94,6 +94,10 @@ make_host() {
 	make -C extra comp_err
 }
 
+post_makeinstall_target() {
+	cp $PKG_DIR/config/my.cnf $ROOT/$PKG_BUILD/.install_pkg/usr/share/mysql/
+}
+
 unpack() {
   MYSQL_PKG="$(echo $PKG_URL | sed 's%.*/\(.*\)$%\1%' | sed 's|%20| |g')"
   SRC_ARCHIVE=$(readlink -f $SOURCES/$PKG_NAME/$MYSQL_PKG)
@@ -102,21 +106,4 @@ unpack() {
   tar xzf "$SRC_ARCHIVE" -C $ROOT/$PKG_BUILD
   mv $ROOT/$PKG_BUILD/mysql-$PKG_VERSION/* $ROOT/$PKG_BUILD
   rmdir $ROOT/$PKG_BUILD/mysql-$PKG_VERSION
-}
-
-
-xxx_addon() {
-	# create bin folder and add binaries
-    mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
-    cp -PR $PKG_BUILD/.install_pkg/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
-	cp -PR $PKG_BUILD/.install_pkg/usr/lib/mysqld $ADDON_BUILD/$PKG_ADDON_ID/bin
-	cp -PR $PKG_BUILD/.install_pkg/usr/lib/mysqlmanager $ADDON_BUILD/$PKG_ADDON_ID/bin
-	
-	# create lib folder and copy libraries
-    mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/lib
-    cp -PR $PKG_BUILD/.install_pkg/usr/lib/mysql/* $ADDON_BUILD/$PKG_ADDON_ID/lib
-	
-	# copy share and config files
-    cp -PR $PKG_BUILD/.install_pkg/usr/share $ADDON_BUILD/$PKG_ADDON_ID
-    cp -PR $PKG_DIR/config/my.cnf $ADDON_BUILD/$PKG_ADDON_ID/share/mysql	
 }

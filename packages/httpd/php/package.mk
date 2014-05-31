@@ -20,6 +20,7 @@
 
 PKG_NAME="php"
 
+# taken from environment
 PHP_VERSION=5.3.3
 
 if [ -z "$PHP_VERSION" ]; then
@@ -40,7 +41,7 @@ else
 fi
 
 # add some other libraries which are need by php extensions
-PKG_DEPENDS_TARGET="toolchain zlib pcre curl openssl libxml2 httpd:host"
+PKG_DEPENDS_TARGET="toolchain zlib pcre curl openssl libxml2 httpd:host libmcrypt"
 PKG_PRIORITY="optional"
 PKG_SECTION="web"
 PKG_SHORTDESC="php: Scripting language especially suited for Web development"
@@ -95,6 +96,8 @@ pre_configure_target() {
                              --without-sqlite3 \
                              --enable-pdo \
                              --without-pdo-sqlite \
+                             --with-mcrypt=$SYSROOT_PREFIX/usr \
+                             --with-mysqli \
                              --with-mysql=$SYSROOT_PREFIX/usr \
                              --with-mysql-sock=/var/tmp/mysql.socket \
                              --with-pdo-mysql=$SYSROOT_PREFIX/usr \

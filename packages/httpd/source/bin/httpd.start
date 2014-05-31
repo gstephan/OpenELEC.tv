@@ -26,8 +26,21 @@ if [ ! -d "$ADDON_HOME/srvroot" ]; then
 	mv "$ADDON_DIR/srvroot" "$ADDON_HOME"
 fi
 
+# create folder for phpMyAdmin
+#mkdir -p $ADDON_HOME/www/htdocs/phpMyAdmin/config
+#chmod o+rw $ADDON_HOME/www/htdocs/phpMyAdmin/config
+
 # create dir for mutex
 mkdir -p /var/logs/
+
+# start mysql server
+(
+  ln -s /storage/.xbmc/addons/service.web.httpd/system.d/service.mysql-server.service /storage/.config/system.d/xbmc.target.wants/service.mysql-server.service
+  cd /storage/.config/system.d
+  ln -s /storage/.xbmc/addons/service.web.httpd/system.d/service.mysql-server.service service.mysql-server.service
+)
+
+systemctl start service.mysql-server
 
 # start httpd
 exec $ADDON_DIR/bin/httpd -d "$ADDON_HOME/srvroot" -f "$ADDON_HOME/srvroot/conf/httpd.conf" -E $ADDON_HOME/httpd.log -e info

@@ -23,7 +23,7 @@ PKG_ARCH="any"
 PKG_LICENSE="OpenSource"
 PKG_SITE="http://www.linuxfromscratch.org/blfs/view/svn/server/apache.html"
 PKG_URL="http://archive.apache.org/dist/httpd/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS_TARGET="toolchain apr-util httpd:host php:target"
+PKG_DEPENDS_TARGET="toolchain apr-util httpd:host php:target mysql-server phpMyAdmin"
 PKG_PRIORITY="optional"
 PKG_SECTION="service/web"
 PKG_SHORTDESC="The Apache web server."
@@ -65,7 +65,7 @@ pre_configure_target() {
   if [ "$APACHE_RUN_AS_ROOT" == "yes" ]; then
   	export CFLAGS="$CFLAGS -DBIG_SECURITY_HOLE"
   fi
-  
+
   export LDFLAGS="$LDFLAGS -L$SYSROOT_PREFIX/usr/lib -lpthread"
 
   APR_DIR_TARGET=$(ls -d $ROOT/$BUILD/apr-[0-9]*/.$TARGET_NAME)
@@ -106,6 +106,8 @@ addon() {
     cp -PR $PKG_BUILD/.install_pkg/usr/lib/* $ADDON_BUILD/$PKG_ADDON_ID/lib
     cp -PR $APR_BUILD_DIR/usr/lib/* $ADDON_BUILD/$PKG_ADDON_ID/lib
     cp -PR $APR_UTIL_BUILD_DIR/usr/lib/* $ADDON_BUILD/$PKG_ADDON_ID/lib
+    
+    cp $SYSROOT_PREFIX/usr/lib/libmcrypt.so.4 $ADDON_BUILD/$PKG_ADDON_ID/lib
 
   # add php module to libs folder
   if [ -d $ROOT/$BUILD/php-[0-9]*/.$TARGET_NAME ]; then
@@ -140,11 +142,44 @@ EOF
     cp -PR $PKG_BUILD/.install_pkg/etc/mime.types $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
     cp -PR $PKG_DIR/config/httpd.conf $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
     cp -PR $PKG_DIR/config/extra $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
-    cp -PR $PKG_DIR/config/php.ini $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf    
+    cp -PR $PKG_DIR/config/php.ini $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
 
     # add other httpd files to server root
     cp -PR $PKG_BUILD/.install_pkg/usr/error $ADDON_BUILD/$PKG_ADDON_ID/srvroot
 
     # create httpd server root log dir
     mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/srvroot/logs
+
+  # mysql server stuff
+  MYSQL_BUILD_DIR=$(ls -d $ROOT/$BUILD/mysql-server-[0-9]*)
+
+	# create bin folder and add binaries
+	mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
+  cp -PR $MYSQL_BUILD_DIR/.install_pkg/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
+	cp -PR $MYSQL_BUILD_DIR/.install_pkg/usr/lib/mysqld $ADDON_BUILD/$PKG_ADDON_ID/bin
+	cp -PR $MYSQL_BUILD_DIR/.install_pkg/usr/lib/mysqlmanager $ADDON_BUILD/$PKG_ADDON_ID/bin
+
+	# create lib folder and copy libraries
+  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/lib
+  cp -PR $MYSQL_BUILD_DIR/.install_pkg/usr/lib/mysql/* $ADDON_BUILD/$PKG_ADDON_ID/lib
+
+	# copy share and config files
+  cp -PR $MYSQL_BUILD_DIR/.install_pkg/usr/share $ADDON_BUILD/$PKG_ADDON_ID
+  #already copied
+  #cp -PR $PKG_DIR/config/my.cnf $ADDON_BUILD/$PKG_ADDON_ID/share/mysql
+
+  # phpMyAdmin stuff
+  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/www/htdocs
+(
+  PHPMYADMIN_DIR=$(ls -d $ROOT/$BUILD/phpMyAdmin-[0-9]*)
+  #echo "PHPMYADMIN_DIR: $PHPMYADMIN_DIR"
+  PHPMYADMIN_DIR=$(basename $PHPMYADMIN_DIR)
+  #echo "PHPMYADMIN_DIR: $PHPMYADMIN_DIR"
+
+  ZIP_SRC_DIR=$(readlink -f $SOURCES/phpMyAdmin)
+
+	cd $ADDON_BUILD/$PKG_ADDON_ID/www/htdocs
+  unzip -qq "$ZIP_SRC_DIR/$PHPMYADMIN_DIR-*.zip"
+  mv phpMyAdmin-* phpMyAdmin
+)
 }
