@@ -1,0 +1,15 @@
+[Unit]
+Description=Apache Httpd Server
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/var/logs/httpd.pid
+ExecStart=/bin/sh -c "exec sh /storage/.xbmc/addons/service.web.httpd/bin/httpd.start"
+TimeoutStopSec=5
+Restart=always
+RestartSec=10
+StartLimitInterval=0
+
+[Install]
+WantedBy=xbmc.target

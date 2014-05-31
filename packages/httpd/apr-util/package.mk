@@ -50,4 +50,6 @@ pre_configure_target() {
 
 makeinstall_host() {
   : # nothing to install
+
+  cp $ROOT/$BUILD/apr-util-*/.$HOST_NAME/apu-1-config $ROOT/$TOOLCHAIN/bin/
 }

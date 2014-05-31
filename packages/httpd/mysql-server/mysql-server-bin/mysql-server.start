@@ -1,0 +1,50 @@
+#!/bin/sh
+
+ADDON_DIR="$HOME/.xbmc/addons/service.databases.mysql"
+ADDON_HOME="$HOME/.xbmc/userdata/addon_data/service.databases.mysql"
+
+# exit if already running
+PID=$(ps aux | grep "$ADDON_DIR/bin/mysqld " | grep -v grep | awk '{print $1}')
+if [ "$PID" != "" ]; then
+	echo "MySQLd is already running"
+	exit 0
+fi
+
+# service setup
+. /etc/profile
+#oe_setup_addon service.web.httpd
+
+# create addon home dir
+mkdir -p "$ADDON_HOME"
+
+# set up initial tables
+FIRSTRUN=0
+if [ ! -d "$ADDON_DIR/data/mysql" ]; then
+	echo "Running first time table setup"
+	FIRSTRUN=1
+	$ADDON_DIR/bin/mysql_install_db --basedir=$ADDON_DIR --datadir=$ADDON_DIR/data	
+fi
+
+# copy config file
+if [ ! -f "$ADDON_HOME/my.cnf" ]; then
+	cp -PR $ADDON_DIR/share/mysql/my.cnf $ADDON_HOME/my.cnf
+fi
+
+# check/create dir for socket
+mkdir -p /var/tmp/
+
+# check/create dir for pid
+mkdir -p /var/run/
+
+# start mysqld
+$ADDON_DIR/bin/mysqld --defaults-file=$ADDON_HOME/my.cnf &
+
+# set a root password
+if [ $FIRSTRUN == 1 ] ; then
+	echo "Setting up root password to 123"
+	while ! $ADDON_DIR/bin/mysql -u root -e ";" 2> /dev/null ; do
+	   sleep 1
+	done
+	$ADDON_DIR/bin/mysqladmin -u root password '123'
+	echo "Done"
+fi

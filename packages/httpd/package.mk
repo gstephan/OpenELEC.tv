@@ -32,15 +32,18 @@ PKG_IS_ADDON="yes"
 PKG_ADDON_TYPE="xbmc.service"
 PKG_AUTORECONF="no"
 
+# If you still desire to serve pages as root
+APACHE_RUN_AS_ROOT=no
+
 PKG_CONFIGURE_OPTS_COMMON="--with-pcre \
                            --enable-ssl \
                            --with-ssl \
-                           --with-z \
-                           --with-libxml2 \
+                           --with-z=$SYSROOT_PREFIX/usr/lib \
+                           --with-libxml2=$SYSROOT_PREFIX/usr/lib \
                            --enable-so \
                            --enable-mods-shared=all \
                            --with-mpm=prefork \
-                           cross_compiling=no \
+                           cross_compiling=yes \
                            apr_cv_process_shared_works=no \
                            ap_cv_void_ptr_lt_long=no \
                            ac_cv_sizeof_struct_iovec=1 \
@@ -59,8 +62,10 @@ pre_configure_host() {
 }
 
 pre_configure_target() {
-  # If you still desire to serve pages as root
-  export CFLAGS="$CFLAGS -DBIG_SECURITY_HOLE"
+  if [ "$APACHE_RUN_AS_ROOT" == "yes" ]; then
+  	export CFLAGS="$CFLAGS -DBIG_SECURITY_HOLE"
+  fi
+  
   export LDFLAGS="$LDFLAGS -L$SYSROOT_PREFIX/usr/lib -lpthread"
 
   APR_DIR_TARGET=$(ls -d $ROOT/$BUILD/apr-[0-9]*/.$TARGET_NAME)
@@ -109,10 +114,21 @@ addon() {
 
     # add httpd www folder
     mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/www
+
     cp -PR $PKG_BUILD/.install_pkg/usr/htdocs $ADDON_BUILD/$PKG_ADDON_ID/www
     cp -PR $PKG_BUILD/.install_pkg/usr/cgi-bin $ADDON_BUILD/$PKG_ADDON_ID/www
     cp -PR $PKG_BUILD/.install_pkg/usr/manual $ADDON_BUILD/$PKG_ADDON_ID/www
     cp -PR $PKG_BUILD/.install_pkg/usr/icons $ADDON_BUILD/$PKG_ADDON_ID/www
+
+cat >$ADDON_BUILD/$PKG_ADDON_ID/www/htdocs/phpinfo.php << EOF
+<?php
+  // Show all information, defaults to INFO_ALL
+  phpinfo();
+  // Show just the module information.
+  // phpinfo(8) yields identical results.
+  phpinfo(INFO_MODULES);
+?>
+EOF
 
     # create httpd server root
     mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/srvroot
@@ -124,15 +140,11 @@ addon() {
     cp -PR $PKG_BUILD/.install_pkg/etc/mime.types $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
     cp -PR $PKG_DIR/config/httpd.conf $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
     cp -PR $PKG_DIR/config/extra $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
-
-  # add php.ini file to conf folder
-  if [ -f $ROOT/$BUILD/php-[0-9]*/php.ini-production ]; then
-    cp $ROOT/$BUILD/php-[0-9]*/php.ini-production $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf/php.ini
-  fi
+    cp -PR $PKG_DIR/config/php.ini $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf    
 
     # add other httpd files to server root
     cp -PR $PKG_BUILD/.install_pkg/usr/error $ADDON_BUILD/$PKG_ADDON_ID/srvroot
 
-    # add httpd logs folder to server root
+    # create httpd server root log dir
     mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/srvroot/logs
 }

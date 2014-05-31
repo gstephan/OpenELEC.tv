@@ -20,18 +20,23 @@
 
 PKG_NAME="php"
 
-#PKG_VERSION="5.5.8"
-PKG_VERSION="5.3.3"
+PHP_VERSION=5.3.3
+
+if [ -z "$PHP_VERSION" ]; then
+  PKG_VERSION="5.5.8"
+else
+  PKG_VERSION="$PHP_VERSION"
+fi
 
 PKG_REV="0"
 PKG_ARCH="any"
 PKG_LICENSE="OpenSource"
 PKG_SITE="http://www.php.net"
 
-if [ $PKG_VERSION != "5.5.8" ]; then
-  PKG_URL="http://museum.php.net/php5/php-$PKG_VERSION.tar.bz2"
-else
+if [ -z "$PHP_VERSION" ]; then
   PKG_URL="http://www.php.net/distributions/$PKG_NAME-$PKG_VERSION.tar.bz2"
+else
+  PKG_URL="http://museum.php.net/php5/php-$PKG_VERSION.tar.bz2"
 fi
 
 # add some other libraries which are need by php extensions
@@ -50,55 +55,65 @@ pre_configure_target() {
   APXS_FILE=$(ls -d $ROOT/$BUILD/httpd-*)/.$HOST_NAME/support/apxs
   chmod +x $APXS_FILE
 
+  CFLAGS="$CFLAGS -I$SYSROOT_PREFIX/usr \
+                  -I$SYSROOT_PREFIX/usr/include \
+                  -I$SYSROOT_PREFIX/usr/include/libxml2 \
+                  -I$SYSROOT_PREFIX/usr/include/freetype2"	
+
   PKG_CONFIGURE_OPTS_TARGET="--disable-all \
+  												   --disable-cli \ 
+                             --without-pear \
                              --with-config-file-path=/storage/.xbmc/userdata/addon_data/service.web.httpd/srvroot/conf \
                              --localstatedir=/var \
-                             --oldincludedir=/dummy \
-                             --without-pear \
+                             --enable-sockets \
+                             --enable-session \
+                             --enable-posix \
+                             --enable-mbstring \
+                             --enable-zip \
+                             --enable-libxml \
+                             --enable-xml \
+                             --enable-xmlreader \
+                             --enable-xmlwriter \
+                             --enable-simplexml \
+                             --with-libxml-dir=$SYSROOT_PREFIX/usr \
+                             --with-curl=$SYSROOT_PREFIX/usr \
+                             --with-openssl=$SYSROOT_PREFIX/usr \
+                             --with-zlib=$SYSROOT_PREFIX/usr \
+                             --with-bz2=$SYSROOT_PREFIX/usr \
+                             --with-zlib=$SYSROOT_PREFIX/usr
+                             --disable-cgi \
                              --without-gettext \
                              --without-gmp \
-                             --disable-sockets \
-                             --disable-pcntl \
+                             --enable-json \
+                             --enable-pcntl \
                              --disable-sysvmsg \
                              --disable-sysvsem \
                              --disable-sysvshm \
-                             --disable-filter \
-                             --disable-calendar \
-                             --disable-spl \
-                             --disable-cgi \
-                             --disable-cli \
-                             --enable-posix \
-                             --enable-json \
-                             --with-curl=shared,$SYSROOT_PREFIX/usr \
-                             --with-openssl=shared \
-                             --with-libxml=shared \
-                             --with-xml=shared \
-                             --with-xmlreader=shared \
-                             --with-xmlwriter=shared \
-                             --with-simplexml=shared \
-                             --with-simplexml=shared \
-                             --with-libxml-dir=$SYSROOT_PREFIX/usr \
-                             --with-zlib=shared \
+                             --enable-filter \
+                             --enable-calendar \
                              --with-pcre-regex \
                              --without-sqlite3 \
                              --enable-pdo \
                              --without-pdo-sqlite \
-                             --with-mysql=shared,$SYSROOT_PREFIX/usr \
+                             --with-mysql=$SYSROOT_PREFIX/usr \
                              --with-mysql-sock=/var/tmp/mysql.socket \
-                             --with-pdo-mysql=shared,$SYSROOT_PREFIX/usr \
-                             --with-apxs2=$APXS_FILE \
-                             \
-                             --with-gd=shared \
-                             --with-jpeg-dir=$SYSROOT_PREFIX/usr \
+                             --with-pdo-mysql=$SYSROOT_PREFIX/usr \
+                             --with-gd \
                              --enable-gd-native-ttf \
+                             --enable-gd-jis-conv \
+                             --with-jpeg-dir=$SYSROOT_PREFIX/usr \
                              --with-freetype-dir=$SYSROOT_PREFIX/usr \
                              --with-png-dir=$SYSROOT_PREFIX/usr \
-                             --enable-zip=shared \
-                             --with-bz2=shared,$SYSROOT_PREFIX/usr \
-                             --with-zlib=shared,$SYSROOT_PREFIX/usr"
+                             --with-apxs2=$APXS_FILE"
 
   # quick hack - freetype is in different folder
   sed -i "s|freetype2/freetype/freetype.h|freetype2/freetype.h|g" ../configure
+}
+
+post_configure_target() {
+	# quick hack
+	sed -i "s|-I/usr/include|-I/XXXXX/usr/include|g" Makefile
+  sed -i "s|-L/usr/lib|-L/XXXXX/usr/lib|g" Makefile
 }
 
 makeinstall_target() {
