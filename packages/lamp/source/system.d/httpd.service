@@ -1,0 +1,18 @@
+[Unit]
+Description=Apache Httpd Server
+After=graphical.target
+Before=xbmc.service
+
+[Service]
+Type=forking
+PIDFile=/var/logs/httpd.pid
+ExecStart=/bin/sh -c "exec sh /storage/.xbmc/addons/service.web.lamp/bin/httpd.start"
+ExecStop=/bin/sh -c "exec sh /storage/.xbmc/addons/service.web.lamp/bin/httpd.stop"
+TimeoutStopSec=10
+Restart=always
+RestartSec=10
+StartLimitInterval=0
+
+[Install]
+Alias=httpd
+WantedBy=xbmc.service
