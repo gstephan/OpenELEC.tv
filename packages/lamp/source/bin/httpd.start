@@ -55,6 +55,22 @@ if [ ! -d "$ADDON_HOME/www" ]; then
   cp -a "$ADDON_DIR/www" "$ADDON_HOME"
 fi
 
+if [ ! -d $ADDON_HOME/ssl ]; then
+(
+	mkdir $ADDON_HOME/ssl
+	cd $ADDON_HOME/ssl
+
+	if [ ! -f ssl-server.conf ]; then
+	  cp $ADDON_DIR/ssl-server.conf ssl-server.conf
+	fi
+	
+	echo "Creating SSL certificates"
+	openssl genrsa -out server.key 2048 
+	openssl req -new -config ssl-server.conf -key server.key -out server.csr
+	openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+)
+fi
+
 if [ ! -f "$ADDON_HOME/www/htdocs/phpMyAdmin/config.inc.php" ]; then
   echo "Copying phpMyAdmin config and changing password"
   cp $ADDON_DIR/config.inc.php $ADDON_HOME/www/htdocs/phpMyAdmin/

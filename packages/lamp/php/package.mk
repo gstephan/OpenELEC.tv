@@ -67,8 +67,8 @@ pre_configure_target() {
 	# really needed ?
 	LDFLAGS="$LDFLAGS -L$SYSROOT_PREFIX/usr/lib"
 
-  PKG_CONFIGURE_OPTS_TARGET="--disable-all \
-                             --disable-cli \
+  PKG_CONFIGURE_OPTS_TARGET="--disable-cli \
+                             --enable-opcache=no \
                              --without-pear \
                              --with-config-file-path=/storage/.xbmc/userdata/addon_data/service.web.lamp/srvroot/conf \
                              --localstatedir=/var \

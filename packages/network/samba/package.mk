@@ -137,6 +137,7 @@ make_target() {
   make bin/libtdb.a
   make bin/libtevent.a
   make bin/libsmbclient.a
+  make bin/smbclient
 
   if [ "$SAMBA_SERVER" = "yes" ]; then
     make bin/samba_multicall

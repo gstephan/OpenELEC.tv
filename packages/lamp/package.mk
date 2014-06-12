@@ -21,7 +21,7 @@
 
 PKG_NAME="lamp"
 PKG_VERSION="1.0"
-PKG_REV="1"
+PKG_REV="3"
 PKG_ARCH="any"
 PKG_LICENSE=""
 PKG_SITE=""
@@ -49,20 +49,20 @@ addon() {
   APR_DIR=$(ls -d $ROOT/$BUILD/apr-[0-9]*/.install_pkg)
   APR_UTIL_DIR=$(ls -d $ROOT/$BUILD/apr-util-[0-9]*/.install_pkg)
   MYSQL_DIR=$(ls -d $ROOT/$BUILD/mysqld-[0-9]*/.install_pkg)
-  EGLIBC_LOCALEDEF=$(ls -d $ROOT/$BUILD/eglibc-localedef-[0-9]*/lib) 
-
-  PHPMYADMIN_BASE_DIR=$(ls -d $ROOT/$BUILD/phpMyAdmin-[0-9]*)
-  PHPMYADMIN_BASE_DIR=$(basename $PHPMYADMIN_BASE_DIR)
+  PHPMYADMIN_BASE_DIR=$(basename $(ls -d $ROOT/$BUILD/phpMyAdmin-[0-9]*))
   PHPMYADMIN_ZIP_DIR=$(readlink -f $SOURCES/phpMyAdmin)
 
-  # create bin folder and add httpd, apr, apr-util binaries
+  # create bin folder and copy binaries
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
   cp -PR $HTTPD_DIR/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
   cp -PR $HTTPD_DIR/usr/sbin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
-  cp -PR $APR_DIR/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
-  cp -PR $APR_UTIL_DIR/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
+  #cp -PR $APR_DIR/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
+  #cp -PR $APR_UTIL_DIR/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
 
-  # create lib folder and copy httpd, apr, apr-util libraries
+  # allow mounting SMB share in owncloud
+	cp $ROOT/$BUILD/samba-[0-9]*/.$TARGET_NAME/bin/smbclient $ADDON_BUILD/$PKG_ADDON_ID/bin
+
+  # create lib folder and copy libraries
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/lib
   cp -PR $HTTPD_DIR/usr/lib/* $ADDON_BUILD/$PKG_ADDON_ID/lib
   cp $APR_DIR/usr/lib/libapr-1.so.0 $ADDON_BUILD/$PKG_ADDON_ID/lib
@@ -73,7 +73,7 @@ addon() {
   cp $ROOT/$BUILD/php-[0-9]*/.$TARGET_NAME/.libs/libphp5.so $ADDON_BUILD/$PKG_ADDON_ID/lib
 
 	# locale stuff (en_US.UTF8)
-	cp -a $EGLIBC_LOCALEDEF/locale $ADDON_BUILD/$PKG_ADDON_ID/lib
+	cp -a $ROOT/$BUILD/eglibc-localedef-[0-9]*/lib/locale $ADDON_BUILD/$PKG_ADDON_ID/lib
 	
   # add httpd www folder
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/www
@@ -81,10 +81,11 @@ addon() {
   cp -PR $HTTPD_DIR/usr/htdocs $ADDON_BUILD/$PKG_ADDON_ID/www
   #cp -PR $HTTPD_DIR/usr/cgi-bin $ADDON_BUILD/$PKG_ADDON_ID/www
   #cp -PR $HTTPD_DIR/usr/manual $ADDON_BUILD/$PKG_ADDON_ID/www
-  #cp -PR $HTTPD_DIR/usr/icons $ADDON_BUILD/$PKG_ADDON_ID/www
+  cp -PR $HTTPD_DIR/usr/icons $ADDON_BUILD/$PKG_ADDON_ID/www
 
 	cp $PKG_DIR/config/*.php $ADDON_BUILD/$PKG_ADDON_ID/www/htdocs/
 	cp $PKG_DIR/config/*.sql $ADDON_BUILD/$PKG_ADDON_ID/
+	cp $PKG_DIR/config/ssl-server.conf $ADDON_BUILD/$PKG_ADDON_ID/
 
   # create httpd server root
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/srvroot

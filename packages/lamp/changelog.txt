@@ -1,2 +1,12 @@
+[B]4.1.3[/B]
+- enabled SSL
+  few more improvements in httpd
+  included smbclient (allows mouting smb shared in owncloud)
+  all done again by dominic7il - thank you
+
+[B]4.1.2[/B]
+- removed ServerName from httpd.conf (thanks to dominic7il)
+  little more php stuff
+
 [B]4.1.1[/B]
 - initial version of lamp addon
