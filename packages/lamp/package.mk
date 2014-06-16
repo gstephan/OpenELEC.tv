@@ -21,12 +21,12 @@
 
 PKG_NAME="lamp"
 PKG_VERSION="1.0"
-PKG_REV="3"
+PKG_REV="4"
 PKG_ARCH="any"
 PKG_LICENSE=""
 PKG_SITE=""
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain httpd mysqld php phpMyAdmin eglibc-localedef:host"
+PKG_DEPENDS_TARGET="toolchain httpd mysqld php phpMyAdmin eglibc-localedef:host samba-smbclient"
 PKG_PRIORITY="optional"
 PKG_SECTION="service/web"
 PKG_SHORTDESC="LAMP (Linux Apache MySQL PHP) software bundle."
@@ -46,82 +46,66 @@ makeinstall_target() {
 
 addon() {
   HTTPD_DIR=$(ls -d $ROOT/$BUILD/httpd-[0-9]*/.install_pkg)
-  APR_DIR=$(ls -d $ROOT/$BUILD/apr-[0-9]*/.install_pkg)
-  APR_UTIL_DIR=$(ls -d $ROOT/$BUILD/apr-util-[0-9]*/.install_pkg)
   MYSQL_DIR=$(ls -d $ROOT/$BUILD/mysqld-[0-9]*/.install_pkg)
   PHPMYADMIN_BASE_DIR=$(basename $(ls -d $ROOT/$BUILD/phpMyAdmin-[0-9]*))
   PHPMYADMIN_ZIP_DIR=$(readlink -f $SOURCES/phpMyAdmin)
 
   # create bin folder and copy binaries
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
+  
   cp -PR $HTTPD_DIR/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
   cp -PR $HTTPD_DIR/usr/sbin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
-  #cp -PR $APR_DIR/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
-  #cp -PR $APR_UTIL_DIR/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
+  cp -PR $MYSQL_DIR/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
+	cp -PR $MYSQL_DIR/usr/lib/mysqld $ADDON_BUILD/$PKG_ADDON_ID/bin
+	cp -PR $MYSQL_DIR/usr/lib/mysqlmanager $ADDON_BUILD/$PKG_ADDON_ID/bin
 
   # allow mounting SMB share in owncloud
 	cp $ROOT/$BUILD/samba-[0-9]*/.$TARGET_NAME/bin/smbclient $ADDON_BUILD/$PKG_ADDON_ID/bin
 
   # create lib folder and copy libraries
   mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/lib
-  cp -PR $HTTPD_DIR/usr/lib/* $ADDON_BUILD/$PKG_ADDON_ID/lib
-  cp $APR_DIR/usr/lib/libapr-1.so.0 $ADDON_BUILD/$PKG_ADDON_ID/lib
-  cp $APR_UTIL_DIR/usr/lib/libaprutil-1.so.0 $ADDON_BUILD/$PKG_ADDON_ID/lib
-  
-  #cp $SYSROOT_PREFIX/usr/lib/libmcrypt.so.4 $ADDON_BUILD/$PKG_ADDON_ID/lib
 
+  cp -PR $HTTPD_DIR/usr/lib/* $ADDON_BUILD/$PKG_ADDON_ID/lib
+  cp $ROOT/$BUILD/apr-[0-9]*/.install_pkg/usr/lib/libapr-1.so.0 $ADDON_BUILD/$PKG_ADDON_ID/lib
+  cp $ROOT/$BUILD/apr-util-[0-9]*/.install_pkg/usr/lib/libaprutil-1.so.0 $ADDON_BUILD/$PKG_ADDON_ID/lib
   cp $ROOT/$BUILD/php-[0-9]*/.$TARGET_NAME/.libs/libphp5.so $ADDON_BUILD/$PKG_ADDON_ID/lib
 
 	# locale stuff (en_US.UTF8)
 	cp -a $ROOT/$BUILD/eglibc-localedef-[0-9]*/lib/locale $ADDON_BUILD/$PKG_ADDON_ID/lib
-	
-  # add httpd www folder
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/www
 
-  cp -PR $HTTPD_DIR/usr/htdocs $ADDON_BUILD/$PKG_ADDON_ID/www
-  #cp -PR $HTTPD_DIR/usr/cgi-bin $ADDON_BUILD/$PKG_ADDON_ID/www
-  #cp -PR $HTTPD_DIR/usr/manual $ADDON_BUILD/$PKG_ADDON_ID/www
-  cp -PR $HTTPD_DIR/usr/icons $ADDON_BUILD/$PKG_ADDON_ID/www
-
-	cp $PKG_DIR/config/*.php $ADDON_BUILD/$PKG_ADDON_ID/www/htdocs/
-	cp $PKG_DIR/config/*.sql $ADDON_BUILD/$PKG_ADDON_ID/
-	cp $PKG_DIR/config/ssl-server.conf $ADDON_BUILD/$PKG_ADDON_ID/
-
-  # create httpd server root
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/srvroot
-
-  # add httpd configuration files to server root
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
-  cp -PR $HTTPD_DIR/etc/original $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
-  cp -PR $HTTPD_DIR/etc/magic $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
-  cp -PR $HTTPD_DIR/etc/mime.types $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
-  cp -PR $PKG_DIR/config/httpd.conf $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
-  cp -PR $PKG_DIR/config/extra $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
-  cp -PR $PKG_DIR/config/php.ini $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
-  cp -PR $PKG_DIR/config/mysqld.cnf $ADDON_BUILD/$PKG_ADDON_ID
-
-  # add other httpd files to server root
-  cp -PR $HTTPD_DIR/usr/error $ADDON_BUILD/$PKG_ADDON_ID/srvroot
-
-  # create httpd server root log dir
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/srvroot/logs
-
-	# create bin folder and add binaries
-	mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
-  cp -PR $MYSQL_DIR/usr/bin/* $ADDON_BUILD/$PKG_ADDON_ID/bin
-	cp -PR $MYSQL_DIR/usr/lib/mysqld $ADDON_BUILD/$PKG_ADDON_ID/bin
-	cp -PR $MYSQL_DIR/usr/lib/mysqlmanager $ADDON_BUILD/$PKG_ADDON_ID/bin
+	# icons for fancy directory listings
+  cp -PR $HTTPD_DIR/usr/icons $ADDON_BUILD/$PKG_ADDON_ID
 
 	# copy share and config files
   cp -PR $MYSQL_DIR/usr/share $ADDON_BUILD/$PKG_ADDON_ID
 
-  # phpMyAdmin stuff
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/www/htdocs
+  # add config folder
+  cp -PR $PKG_DIR/config $ADDON_BUILD/$PKG_ADDON_ID/config
+
+  # add httpd conf folder
+  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
+
+  # add other httpd files to server root
+  cp -PR $HTTPD_DIR/usr/error $ADDON_BUILD/$PKG_ADDON_ID/srvroot
+  
+  cp -PR $PKG_DIR/httpd-conf/* $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf  
+  # add httpd configuration files to server root
+  cp -PR $HTTPD_DIR/etc/original $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
+  cp -PR $HTTPD_DIR/etc/magic $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
+  cp -PR $HTTPD_DIR/etc/mime.types $ADDON_BUILD/$PKG_ADDON_ID/srvroot/conf
+
+  # add httpd htdocs folder
+  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/htdocs
+ 
+	cp $PKG_DIR/htdocs/* $ADDON_BUILD/$PKG_ADDON_ID/htdocs
+
+  # create httpd server root log dir
+  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/srvroot/logs
+
+  # phpMyAdmin stuff 	
 (
-	cd $ADDON_BUILD/$PKG_ADDON_ID/www/htdocs
+	cd $ADDON_BUILD/$PKG_ADDON_ID/htdocs
   unzip -qq "$PHPMYADMIN_ZIP_DIR/$PHPMYADMIN_BASE_DIR-*.zip"
   mv phpMyAdmin-* phpMyAdmin
 )
-
-	cp $PKG_DIR/config/config.inc.php $ADDON_BUILD/$PKG_ADDON_ID
 }

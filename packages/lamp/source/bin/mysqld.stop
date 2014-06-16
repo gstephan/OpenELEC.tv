@@ -25,7 +25,6 @@ ADDON_ID=service.web.lamp
 ADDON_DIR="$HOME/.xbmc/addons/$ADDON_ID"
 ADDON_HOME="$HOME/.xbmc/userdata/addon_data/$ADDON_ID"
 
-#PID=$(ps aux | grep "$ADDON_DIR/bin/mysqld " | grep -v grep | awk '{print $1}')
 PID=$(ps aux | awk '/\/bin\/mysqld / {printf("%s", $1); exit 0}')
 if [ -n "$PID" ]; then
   kill -TERM $PID

@@ -30,16 +30,17 @@ datadir     = /storage/.xbmc/userdata/addon_data/service.web.lamp/data
 log-error   = /storage/.xbmc/userdata/addon_data/service.web.lamp/mysqld.log
 pid-file    = /var/run/mysqld.pid
 socket		= /var/tmp/mysql.socket
+bind-address = 0.0.0.0
 port		= 3306
 skip-external-locking
-key_buffer_size = 16K
-max_allowed_packet = 1M
-table_open_cache = 4
-sort_buffer_size = 64K
-read_buffer_size = 256K
+key_buffer_size      = 16K
+max_allowed_packet   = 1M
+table_open_cache     = 4
+sort_buffer_size     = 64K
+read_buffer_size     = 256K
 read_rnd_buffer_size = 256K
-net_buffer_length = 2K
-thread_stack = 128K
+net_buffer_length    = 2K
+thread_stack         = 128K
 
 # Don't listen on a TCP/IP port at all. This can be a security enhancement,
 # if all processes that need to connect to mysqld run on the same host.

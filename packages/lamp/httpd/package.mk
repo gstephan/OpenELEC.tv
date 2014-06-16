@@ -44,7 +44,13 @@ PKG_CONFIGURE_OPTS_COMMON="--with-pcre \
                            --with-libxml2=$SYSROOT_PREFIX/usr/lib \
                            --enable-so \
                            --enable-mods-shared=all \
+                           --enable-mpms-shared=all \
                            --with-mpm=prefork \
+                           --enable-deflate \
+													 --enable-proxy \
+													 --enable-proxy-http \
+													 --enable-proxy-balancer \
+													 --enable-rewrite \
                            cross_compiling=yes \
                            apr_cv_process_shared_works=no \
                            ap_cv_void_ptr_lt_long=no \
@@ -52,6 +58,30 @@ PKG_CONFIGURE_OPTS_COMMON="--with-pcre \
                            apr_cv_tcp_nodelay_with_cork=no
                            ac_cv_func_setpgrp_void=no \
                            ac_cv_file__dev_zero=no"
+
+# bitnami
+#--prefix=/storage/.xbmc/addons/service.web.lamp \
+#--enable-authnz-ldap \
+#--enable-ldap \
+#--with-ldap \
+aPKG_CONFIGURE_OPTS_COMMON=" \
+--enable-so \
+--enable-mods-shared=most \
+--disable-auth_dbm \
+--without-berkeley-db \
+--enable-deflate \
+--enable-ssl \
+--with-ssl \
+--enable-proxy \
+--enable-proxy-http \
+--enable-proxy-balancer \
+--enable-rewrite \
+--with-pcre \
+--enable-mpms-shared=all \
+--with-mpm=prefork \
+\
+ap_cv_void_ptr_lt_long=no \
+"
 
 # host is build before target
 pre_configure_host() {
@@ -90,4 +120,9 @@ post_configure_host() {
   ./gen_test_char > server/test_char.h
   # don't call it again
   sed -i 's|./gen_test_char >|#|' server/Makefile
+}
+
+post_makeinstall_target() {
+	#sed -i "s|HTTPD='.*|HTTPD='/storage/.xbmc/addons/service.web.lamp/bin/httpd'|" ../.install_pkg/usr/sbin/apachectl
+	sed -i "s|HTTPD='.*|HTTPD='/storage/.xbmc/addons/service.web.lamp/bin/httpd -f /storage/.xbmc/userdata/addon_data/service.web.lamp/srvroot/conf/httpd.conf'|" ../.install_pkg/usr/sbin/apachectl
 }

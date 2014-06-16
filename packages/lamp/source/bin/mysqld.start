@@ -37,6 +37,10 @@ chmod a+x $ADDON_DIR/bin/*
 # create addon home dir
 mkdir -p "$ADDON_HOME"
 
+if [ ! -d "$ADDON_HOME/config" ]; then
+  cp -a "$ADDON_DIR/config" "$ADDON_HOME"
+fi
+
 # check/create dir for socket
 mkdir -p /var/tmp/
 
@@ -44,7 +48,7 @@ mkdir -p /var/tmp/
 mkdir -p /var/run/
 
 # exit if already running
-PID=$(ps aux | grep "$ADDON_DIR/bin/mysqld " | grep -v grep | awk '{print $1}')
+PID=$(ps aux | awk '/\/bin\/mysqld / {printf("%s", $1); exit 0}')
 if [ -n "$PID" ]; then
   echo "MySQLd is already running"
   exit 0
@@ -59,15 +63,15 @@ if [ ! -d "$ADDON_HOME/data/mysql" ]; then
 fi
 
 # copy config file
-if [ ! -f "$ADDON_HOME/mysqld.cnf" ]; then
-  cp $ADDON_DIR/mysqld.cnf $ADDON_HOME/mysqld.cnf
+if [ ! -f "$ADDON_HOME/config/mysqld.cnf" ]; then
+  cp $ADDON_DIR/config/mysqld.cnf $ADDON_HOME/config/mysqld.cnf
 fi
 
 # create dir for logs
 mkdir -p /var/logs/
 
 # start mysqld
-exec $ADDON_DIR/bin/mysqld --defaults-file=$ADDON_HOME/mysqld.cnf &
+exec $ADDON_DIR/bin/mysqld --defaults-file=$ADDON_HOME/config/mysqld.cnf &
 
 # set a root password
 if [ $FIRST_RUN == 1 ] ; then

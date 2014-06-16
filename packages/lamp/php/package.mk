@@ -72,6 +72,7 @@ pre_configure_target() {
                              --without-pear \
                              --with-config-file-path=/storage/.xbmc/userdata/addon_data/service.web.lamp/srvroot/conf \
                              --localstatedir=/var \
+                             --enable-ftp \
                              --enable-sockets \
                              --enable-session \
                              --enable-posix \
