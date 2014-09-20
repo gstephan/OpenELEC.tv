@@ -1,0 +1,12 @@
+[Unit]
+Description=Status LED
+After=xbmc.service
+
+[Service]
+Type=oneshot
+ExecStart=-/bin/sh -c "/usr/bin/status-led on"
+ExecStop=-/bin/sh -c "/usr/bin/status-led blinking"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=xbmc.target

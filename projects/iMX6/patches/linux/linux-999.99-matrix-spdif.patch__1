@@ -1,0 +1,42 @@
+--- a/arch/arm/boot/dts/imx6qdl-sabresd.dtsi.orig	2014-09-13 16:18:54.000000000 +0200
++++ b/arch/arm/boot/dts/imx6qdl-sabresd.dtsi	2014-09-13 16:19:05.000000000 +0200
+@@ -124,6 +124,13 @@
+ 		mux-ext-port = <3>;
+ 	};
+ 
++	sound-spdif {
++		compatible = "fsl,imx-audio-spdif";
++		model = "imx-spdif";
++		spdif-controller = <&spdif>;
++		spdif-out;
++	};
++	
+ 	backlight {
+ 		compatible = "pwm-backlight";
+ 		pwms = <&pwm1 0 5000000>;
+@@ -265,6 +272,12 @@
+ 	status = "okay";
+ };
+ 
++&spdif {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_spdif>;
++	status = "okay";
++};
++
+ &i2c1 {
+ 	clock-frequency = <100000>;
+ 	pinctrl-names = "default";
+@@ -522,6 +535,12 @@
+ 			>;
+ 		};
+ 
++		pinctrl_spdif: spdifgrp {
++			fsl,pins = <
++				MX6QDL_PAD_ENET_RXD0__SPDIF_OUT		0x1b0b0
++			>;
++		};
++
+ 		pinctrl_i2c3: i2c3grp {
+ 			fsl,pins = <
+ 				MX6QDL_PAD_GPIO_3__I2C3_SCL		0x4001b8b1

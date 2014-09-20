@@ -1,0 +1,8 @@
+[Unit]
+Description=SOC fan monitor service
+
+[Service]
+ExecStart=/usr/bin/soc-fan-monitor
+
+[Install]
+WantedBy=multi-user.target
