@@ -1,0 +1,6 @@
+# Made by Pix
+
+/dev/sda1       /root   ext4    defaults,noatime,nodiratime     0 0
+/dev/sda1       /home/xbmc      ext4    defaults,noatime,nodiratime     0 0
+
+192.168.1.254:/var/storage/stuff      /var/storage/stuff      nfs     defaults,port=2049,nolock,proto=tcp        0 0
